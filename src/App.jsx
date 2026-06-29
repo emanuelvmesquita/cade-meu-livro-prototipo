@@ -5,7 +5,8 @@ import {
   Heart, Settings, Bell, LogOut, Shield, User,
   Send, Clock, CheckCircle2, XCircle, BookMarked,
   StickyNote, MessageCircle, UsersRound, ShieldCheck, History, Image as ImageIcon,
-  LayoutGrid, List, BookX
+  LayoutGrid, List, BookX,
+  UserMinus, UserCheck, Key
 } from "lucide-react";
 
 /* =========================================================================
@@ -44,6 +45,7 @@ const COLORS = {
   warnBg: "#FAF0DC",
   danger: "#B23A2E",
   dangerBg: "#F8E4E0",
+  neutralLight: "#C4BFB6",
 };
 
 /* =========================================================================
@@ -51,7 +53,7 @@ const COLORS = {
    Adaptado do window.storage do ambiente Claude para localStorage do navegador.
    Mesma assinatura (loadKey/saveKey), para não precisar alterar o resto do app.
    ========================================================================= */
-const STORAGE_PREFIX = "cademeulivro:";
+const STORAGE_PREFIX = "acervovivo:";
 
 async function loadKey(key, fallback) {
   try {
@@ -103,6 +105,13 @@ function addDays(iso, n) {
   const d = new Date(iso + "T00:00:00");
   d.setDate(d.getDate() + n);
   return d.toISOString().slice(0, 10);
+}
+function diffDays(isoA, isoB) {
+  return Math.round((new Date(isoB + "T00:00:00") - new Date(isoA + "T00:00:00")) / 86400000);
+}
+function diaSemanaCurto(iso) {
+  const dias = ["domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"];
+  return dias[new Date(iso + "T00:00:00").getDay()];
 }
 function fmtDate(iso) {
   if (!iso) return "—";
@@ -221,7 +230,17 @@ const SEED_EMPRESTIMOS = [
   { id: "E1", livroId: "L6", locatario: "Veruska FB", dataEmprestimo: addDays(todayISO(), -32), dataDevolucao: addDays(todayISO(), 1), status: "Ativo", observacoes: "Indicação", renovacao: null },
   { id: "E2", livroId: "L7", locatario: "Jonas Amorim", dataEmprestimo: addDays(todayISO(), -45), dataDevolucao: addDays(todayISO(), -29), status: "Atrasado", observacoes: "Pág 26, 56 a 64 riscos do dono", renovacao: null },
   { id: "E3", livroId: "L8", locatario: "Vanessa", dataEmprestimo: addDays(todayISO(), -45), dataDevolucao: addDays(todayISO(), -29), status: "Atrasado", observacoes: "Discipulado", renovacao: null },
-  { id: "E4", livroId: "L9", locatario: "Jonas", dataEmprestimo: addDays(todayISO(), -60), dataDevolucao: addDays(todayISO(), -59), status: "Devolvido", observacoes: "Discipulado", renovacao: null },
+  { id: "E4",  livroId: "L9",  locatario: "Jonas",         dataEmprestimo: addDays(todayISO(), -60),  dataDevolucao: addDays(todayISO(), -46),  dataDevolucaoEfetiva: addDays(todayISO(), -48),  status: "Devolvido", observacoes: "Discipulado", renovacao: null },
+  { id: "H1",  livroId: "L3",  locatario: "Veruska FB",    dataEmprestimo: addDays(todayISO(), -88),  dataDevolucao: addDays(todayISO(), -74),  dataDevolucaoEfetiva: addDays(todayISO(), -75),  status: "Devolvido", observacoes: "", renovacao: null },
+  { id: "H2",  livroId: "L1",  locatario: "Jonas Amorim",  dataEmprestimo: addDays(todayISO(), -80),  dataDevolucao: addDays(todayISO(), -66),  dataDevolucaoEfetiva: addDays(todayISO(), -60),  status: "Devolvido", observacoes: "", renovacao: null },
+  { id: "H3",  livroId: "L4",  locatario: "Vanessa",       dataEmprestimo: addDays(todayISO(), -75),  dataDevolucao: addDays(todayISO(), -61),  dataDevolucaoEfetiva: addDays(todayISO(), -62),  status: "Devolvido", observacoes: "", renovacao: null },
+  { id: "H4",  livroId: "L2",  locatario: "Veruska FB",    dataEmprestimo: addDays(todayISO(), -70),  dataDevolucao: addDays(todayISO(), -56),  dataDevolucaoEfetiva: addDays(todayISO(), -50),  status: "Devolvido", observacoes: "", renovacao: null },
+  { id: "H5",  livroId: "L5",  locatario: "Marcos Lima",   dataEmprestimo: addDays(todayISO(), -65),  dataDevolucao: addDays(todayISO(), -51),  dataDevolucaoEfetiva: addDays(todayISO(), -52),  status: "Devolvido", observacoes: "", renovacao: null },
+  { id: "H6",  livroId: "L6",  locatario: "Jonas Amorim",  dataEmprestimo: addDays(todayISO(), -55),  dataDevolucao: addDays(todayISO(), -41),  dataDevolucaoEfetiva: addDays(todayISO(), -38),  status: "Devolvido", observacoes: "", renovacao: null },
+  { id: "H7",  livroId: "L7",  locatario: "Vanessa",       dataEmprestimo: addDays(todayISO(), -50),  dataDevolucao: addDays(todayISO(), -36),  dataDevolucaoEfetiva: addDays(todayISO(), -36),  status: "Devolvido", observacoes: "", renovacao: null },
+  { id: "H8",  livroId: "L1",  locatario: "Marcos Lima",   dataEmprestimo: addDays(todayISO(), -42),  dataDevolucao: addDays(todayISO(), -28),  dataDevolucaoEfetiva: addDays(todayISO(), -20),  status: "Devolvido", observacoes: "", renovacao: null },
+  { id: "H9",  livroId: "L3",  locatario: "Jonas",         dataEmprestimo: addDays(todayISO(), -35),  dataDevolucao: addDays(todayISO(), -21),  dataDevolucaoEfetiva: addDays(todayISO(), -22),  status: "Devolvido", observacoes: "", renovacao: null },
+  { id: "H10", livroId: "L8",  locatario: "Veruska FB",    dataEmprestimo: addDays(todayISO(), -28),  dataDevolucao: addDays(todayISO(), -14),  dataDevolucaoEfetiva: addDays(todayISO(), -10),  status: "Devolvido", observacoes: "", renovacao: null },
 ];
 
 const SEED_ANOTACOES = [
@@ -602,7 +621,7 @@ function AppInner() {
   }
 
   if (!auth) {
-    return <LoginScreen usuarios={usuarios} onLogin={setAuth} sendNotif={sendNotif} showToast={showToast} />;
+    return <LoginScreen usuarios={usuarios} setUsuarios={setUsuarios} onLogin={setAuth} sendNotif={sendNotif} showToast={showToast} />;
   }
 
   const ctx = {
@@ -653,6 +672,7 @@ const NAV_ITEMS = [
   { key: "comunidade", label: "Comunidade", icon: UsersRound },
 ];
 const ADMIN_ITEMS = [
+  { key: "usuarios", label: "Usuários", icon: UsersRound },
   { key: "renovacoes", label: "Renovações", icon: RefreshCw },
   { key: "notificacoes", label: "Notificações", icon: Settings },
   { key: "log", label: "Log de mensagens", icon: Bell },
@@ -681,7 +701,7 @@ function Shell({ route, setRoute, auth, onLogout, children }) {
             <div style={{ width: 36, height: 36, borderRadius: 10, background: COLORS.accent, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               <BookOpen size={20} color="#fff" />
             </div>
-            <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: 18, lineHeight: 1.1 }}>Cadê meu<br />livro?</div>
+            <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: 18, lineHeight: 1.1 }}>Acervo Vivo</div>
           </div>
           <nav style={{ display: "flex", flexDirection: "column", gap: 2, flex: 1 }}>
             {items.map((it) => (
@@ -713,7 +733,7 @@ function Shell({ route, setRoute, auth, onLogout, children }) {
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <BookOpen size={20} color={COLORS.accent} />
-              <span style={{ fontFamily: "'Source Serif 4', serif", fontSize: 17 }}>Cadê meu livro?</span>
+              <span style={{ fontFamily: "'Source Serif 4', serif", fontSize: 17 }}>Acervo Vivo</span>
             </div>
             <UserMenu
               auth={auth}
@@ -892,6 +912,7 @@ function Router({ route, setRoute, ctx }) {
     case "anotacoes": return <AnotacoesScreen ctx={ctx} />;
     case "comunidade": return <ComunidadeScreen ctx={ctx} />;
     case "perfil": return <PerfilScreen ctx={ctx} />;
+    case "usuarios": return isAdmin ? <GestaoUsuariosScreen ctx={ctx} /> : <Negado />;
     case "renovacoes": return isAdmin ? <RenovacoesAdminScreen ctx={ctx} /> : <Negado />;
     case "notificacoes": return isAdmin ? <NotificacoesConfigScreen ctx={ctx} /> : <Negado />;
     case "log": return isAdmin ? <NotifLogScreen ctx={ctx} /> : <Negado />;
@@ -905,7 +926,17 @@ function Negado() {
 /* =========================================================================
    SCREEN: LOGIN — CPF + senha, depois 2FA simulado
    ========================================================================= */
-function LoginScreen({ usuarios, onLogin, sendNotif, showToast }) {
+function senhaForte(s) {
+  return {
+    min8: s.length >= 8,
+    upper: /[A-Z]/.test(s),
+    lower: /[a-z]/.test(s),
+    digit: /[0-9]/.test(s),
+    special: /[^A-Za-z0-9]/.test(s),
+  };
+}
+
+function LoginScreen({ usuarios, setUsuarios, onLogin, sendNotif, showToast }) {
   useFonts();
   const [cpf, setCpf] = useState("");
   const [senha, setSenha] = useState("");
@@ -917,6 +948,9 @@ function LoginScreen({ usuarios, onLogin, sendNotif, showToast }) {
   const [expiresAt, setExpiresAt] = useState(null);
   const [secondsLeft, setSecondsLeft] = useState(60);
   const [tokenErro, setTokenErro] = useState("");
+  const [novaSenha, setNovaSenha] = useState("");
+  const [confirmarSenha, setConfirmarSenha] = useState("");
+  const [senhaErro, setSenhaErro] = useState("");
 
   useEffect(() => {
     if (stage !== "token" || !expiresAt) return;
@@ -932,7 +966,7 @@ function LoginScreen({ usuarios, onLogin, sendNotif, showToast }) {
     setToken(tk);
     setExpiresAt(Date.now() + 60000);
     setSecondsLeft(60);
-    sendNotif("2FA", user.telefone, `Seu código de verificação Cadê meu livro? é ${tk}. Válido por 60 segundos.`);
+    sendNotif("2FA", user.telefone, `Seu código de verificação Acervo Vivo é ${tk}. Válido por 60 segundos.`);
   }
 
   function onlyDigits(s) { return (s || "").replace(/\D/g, ""); }
@@ -944,6 +978,16 @@ function LoginScreen({ usuarios, onLogin, sendNotif, showToast }) {
       const user = lista.find((u) => onlyDigits(u.cpf) === onlyDigits(cpf));
       if (!user) {
         setErro("CPF não encontrado. Verifique se digitou corretamente (ex: 111.111.111-11).");
+        return;
+      }
+      if (user.ativo === false) {
+        setErro("Esta conta está inativa. Entre em contato com o administrador.");
+        return;
+      }
+      if (user.pendingSenha) {
+        setErro("");
+        setPendingUser(user);
+        setStage("definirSenha");
         return;
       }
       if (user.senha !== senha) {
@@ -999,12 +1043,79 @@ function LoginScreen({ usuarios, onLogin, sendNotif, showToast }) {
           }}>
             <BookOpen size={28} color="#fff" />
           </div>
-          <h1 style={{ color: "#fff", fontFamily: "'Source Serif 4', serif", fontSize: 28, margin: 0 }}>Cadê meu livro?</h1>
+          <h1 style={{ color: "#fff", fontFamily: "'Source Serif 4', serif", fontSize: 28, margin: 0 }}>Acervo Vivo</h1>
           <p style={{ color: "rgba(255,255,255,0.65)", marginTop: 6, fontSize: 14 }}>Gestão de biblioteca pessoal</p>
         </div>
 
         <div style={{ background: "#fff", borderRadius: 18, padding: 28, boxShadow: "0 20px 50px rgba(0,0,0,0.25)" }}>
-          {stage === "credenciais" ? (
+          {stage === "definirSenha" ? (() => {
+            const criterios = senhaForte(novaSenha);
+            const aprovado = Object.values(criterios).every(Boolean);
+            const forca = Object.values(criterios).filter(Boolean).length;
+            const corForca = forca <= 2 ? COLORS.danger : forca <= 3 ? COLORS.warn : forca === 4 ? "#B8841E" : COLORS.success;
+            const labelForca = ["", "Muito fraca", "Fraca", "Razoável", "Boa", "Forte"][forca];
+
+            function submitDefinirSenha(e) {
+              e.preventDefault();
+              if (!aprovado) { setSenhaErro("A senha não atende todos os critérios de segurança."); return; }
+              if (novaSenha !== confirmarSenha) { setSenhaErro("As senhas não coincidem."); return; }
+              setSenhaErro("");
+              setUsuarios((prev) => prev.map((u) =>
+                u.cpf === pendingUser.cpf
+                  ? { ...u, senha: novaSenha, pendingSenha: false, tokenSenha: undefined }
+                  : u
+              ));
+              const atualizado = { ...pendingUser, senha: novaSenha, pendingSenha: false };
+              setPendingUser(atualizado);
+              generateToken(atualizado);
+              setStage("token");
+              showToast("Senha definida com sucesso!");
+            }
+
+            return (
+              <form onSubmit={submitDefinirSenha}>
+                <button type="button" onClick={() => setStage("credenciais")} style={{ background: "none", border: "none", color: COLORS.neutral, display: "flex", alignItems: "center", gap: 4, cursor: "pointer", marginBottom: 12, fontSize: 13, padding: 0 }}>
+                  <ArrowLeft size={14} /> Voltar
+                </button>
+                <h2 style={{ fontFamily: "'Source Serif 4', serif", fontSize: 20, marginTop: 0, color: COLORS.primaryDark }}>Primeiro acesso</h2>
+                <p style={{ fontSize: 13, color: COLORS.neutral, margin: "-6px 0 16px" }}>
+                  Olá, <strong>{pendingUser?.nome?.split(" ")[0]}</strong>! Sua conta foi criada pelo administrador. Defina uma senha segura para começar.
+                </p>
+                <Field label="Nova senha" required>
+                  <Input type="password" value={novaSenha} onChange={(e) => { setNovaSenha(e.target.value); setSenhaErro(""); }} placeholder="••••••••" />
+                </Field>
+                {novaSenha.length > 0 && (
+                  <div style={{ marginTop: -8, marginBottom: 14 }}>
+                    <div style={{ display: "flex", gap: 4, marginBottom: 8 }}>
+                      {[1,2,3,4,5].map((i) => (
+                        <div key={i} style={{ flex: 1, height: 4, borderRadius: 2, background: i <= forca ? corForca : COLORS.border, transition: "background .2s" }} />
+                      ))}
+                    </div>
+                    <div style={{ fontSize: 11, color: corForca, fontWeight: 600, marginBottom: 8 }}>{labelForca}</div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 12px" }}>
+                      {[
+                        ["min8", "Mínimo 8 caracteres"],
+                        ["upper", "Letra maiúscula"],
+                        ["lower", "Letra minúscula"],
+                        ["digit", "Número"],
+                        ["special", "Caractere especial"],
+                      ].map(([k, label]) => (
+                        <div key={k} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: criterios[k] ? COLORS.success : COLORS.neutral }}>
+                          {criterios[k] ? <CheckCircle2 size={11} /> : <XCircle size={11} />}
+                          {label}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <Field label="Confirmar senha" required>
+                  <Input type="password" value={confirmarSenha} onChange={(e) => { setConfirmarSenha(e.target.value); setSenhaErro(""); }} placeholder="••••••••" />
+                </Field>
+                {senhaErro && <div style={{ color: COLORS.danger, fontSize: 13, marginBottom: 12 }}>{senhaErro}</div>}
+                <Btn type="submit" style={{ width: "100%", justifyContent: "center" }} disabled={!aprovado}>Definir senha e continuar</Btn>
+              </form>
+            );
+          })() : stage === "credenciais" ? (
             <form onSubmit={submitCredenciais}>
               <h2 style={{ fontFamily: "'Source Serif 4', serif", fontSize: 20, marginTop: 0, color: COLORS.primaryDark }}>Entrar</h2>
               <Field label="CPF" required>
@@ -1081,46 +1192,236 @@ function LoginScreen({ usuarios, onLogin, sendNotif, showToast }) {
    SCREEN: PAINEL
    ========================================================================= */
 function PainelScreen({ ctx, setRoute }) {
-  const { livros, emprestimos } = ctx;
+  const { livros, emprestimos, usuarios, renovacoes, leituras } = ctx;
+  const isAdmin = ctx.auth.perfil === "administrador";
+  const today = todayISO();
+
+  // admin — atenção
+  const atrasadosList = emprestimos
+    .filter((e) => e.status === "Atrasado")
+    .map((e) => ({ ...e, livro: livros.find((l) => l.id === e.livroId), dias: diffDays(e.dataDevolucao, today) }))
+    .sort((a, b) => b.dias - a.dias);
+  const renovPendentes = (renovacoes || []).filter((r) => r.status === "Solicitada");
+  const semAcaoPendente = atrasadosList.length === 0 && renovPendentes.length === 0;
+
+  // admin — visão geral
   const total = livros.length;
-  const disponiveis = livros.filter((l) => l.status !== "Emprestado").length;
   const ativos = emprestimos.filter((e) => e.status === "Ativo" || e.status === "Atrasado").length;
-  const atrasados = emprestimos.filter((e) => e.status === "Atrasado").length;
+  const emDiaPct = ativos === 0 ? 100 : Math.round(((ativos - atrasadosList.length) / ativos) * 100);
+  const novosUltimos7 = emprestimos.filter((e) => e.dataEmprestimo >= addDays(today, -7)).length;
 
-  const cards = [
-    { label: "Total de Livros", value: total, icon: BookOpen, tone: "neutral", route: "livros" },
-    { label: "Disponíveis", value: disponiveis, icon: CheckSquare, tone: "success", route: "livros" },
-    { label: "Emprestados", value: ativos, icon: RefreshCw, tone: "accent", route: "emprestimos" },
-    { label: "Atrasados", value: atrasados, icon: AlertTriangle, tone: "danger", route: "emprestimos" },
-  ];
+  // admin — métricas e rankings
+  const devolvidos = emprestimos.filter((e) => e.status === "Devolvido" && e.dataDevolucaoEfetiva);
+  const duracaoMedia = devolvidos.length === 0 ? 0
+    : Math.round(devolvidos.reduce((acc, e) => acc + diffDays(e.dataEmprestimo, e.dataDevolucaoEfetiva), 0) / devolvidos.length);
+  const noPrazoCount = devolvidos.filter((e) => e.dataDevolucaoEfetiva <= e.dataDevolucao).length;
+  const taxaNoPrazo = devolvidos.length === 0 ? 100 : Math.round((noPrazoCount / devolvidos.length) * 100);
+  const totalUsuarios = usuarios.length;
+  const totalLeitores = usuarios.filter((u) => u.perfil === "leitor").length;
+  const rankingLivros = Object.entries(
+    emprestimos.reduce((acc, e) => { acc[e.livroId] = (acc[e.livroId] || 0) + 1; return acc; }, {})
+  ).map(([livroId, count]) => ({ livro: livros.find((l) => l.id === livroId), count }))
+    .sort((a, b) => b.count - a.count).slice(0, 10);
+  const rankingLeitores = Object.entries(
+    emprestimos.reduce((acc, e) => { acc[e.locatario] = (acc[e.locatario] || 0) + 1; return acc; }, {})
+  ).map(([nome, count]) => ({ nome, count }))
+    .sort((a, b) => b.count - a.count).slice(0, 10);
 
-  return (
+  // leitor — meus empréstimos
+  const primeiroNome = ctx.auth.nome.split(" ")[0].toLowerCase();
+  const meusEmprestimos = emprestimos
+    .filter((e) => e.status !== "Devolvido" && e.locatario.toLowerCase().includes(primeiroNome))
+    .map((e) => ({ ...e, livro: livros.find((l) => l.id === e.livroId), dias: diffDays(today, e.dataDevolucao) }))
+    .sort((a, b) => a.dias - b.dias);
+  const proximo = meusEmprestimos[0];
+  const minhasRenovPendentes = (renovacoes || []).filter(
+    (r) => r.status === "Solicitada" && r.locatario.toLowerCase().includes(primeiroNome)
+  );
+  const emLeitura = (leituras || []).find((l) => l.progresso > 0 && l.progresso < 100);
+  const livroEmLeitura = emLeitura ? livros.find((l) => l.id === emLeitura.livroId) : null;
+
+  // render admin
+  if (isAdmin) return (
     <div>
-      <PageTitle title="Painel" subtitle={`Olá, ${ctx.auth.nome.split(" ")[0]}. Aqui está a situação do acervo hoje.`} />
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 14 }}>
-        {cards.map((c) => (
-          <button key={c.label} onClick={() => setRoute(c.route)} style={{
-            textAlign: "left", background: "#fff", border: `1px solid ${COLORS.border}`, borderRadius: 16,
-            padding: 18, cursor: "pointer", fontFamily: "Inter, sans-serif",
-          }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-              <span style={{ fontSize: 13, color: COLORS.neutral, fontWeight: 600 }}>{c.label}</span>
-              <c.icon size={18} color={c.tone === "danger" ? COLORS.danger : c.tone === "success" ? COLORS.success : c.tone === "accent" ? COLORS.accent : COLORS.neutral} />
-            </div>
-            <div style={{ fontSize: 34, fontWeight: 700, color: COLORS.primaryDark, marginTop: 8, fontFamily: "'Source Serif 4', serif" }}>{c.value}</div>
-          </button>
-        ))}
-      </div>
+      <Eyebrow text="Acervo Vivo" />
+      <h1 style={{ fontFamily: "Inter, sans-serif", fontWeight: 300, fontSize: 26, margin: "0 0 22px", color: COLORS.ink, letterSpacing: "-0.01em" }}>
+        {semAcaoPendente ? "Tudo em ordem por aqui" : "O que precisa da sua atenção"}
+      </h1>
 
-      {atrasados > 0 && ctx.auth.perfil === "administrador" && (
-        <div style={{ marginTop: 24, background: COLORS.dangerBg, border: `1px solid ${COLORS.danger}22`, borderRadius: 14, padding: 16, display: "flex", alignItems: "center", gap: 12 }}>
-          <AlertTriangle size={20} color={COLORS.danger} />
-          <div style={{ fontSize: 14 }}>
-            <strong>{atrasados}</strong> empréstimo(s) em atraso precisam de atenção.
-            <button onClick={() => setRoute("emprestimos")} style={{ marginLeft: 8, background: "none", border: "none", color: COLORS.danger, fontWeight: 700, cursor: "pointer", textDecoration: "underline" }}>Ver agora</button>
-          </div>
+      {semAcaoPendente ? (
+        <div style={{ border: `1px solid ${COLORS.border}`, borderRadius: 12, padding: "20px 18px", display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
+          <CheckCircle2 size={20} color={COLORS.success} />
+          <div style={{ fontSize: 13, color: COLORS.ink }}>Nenhum empréstimo atrasado e nenhuma renovação pendente de análise.</div>
+        </div>
+      ) : (
+        <div style={{ border: `1px solid ${COLORS.border}`, borderRadius: 12, overflow: "hidden", marginBottom: 28 }}>
+          {atrasadosList.map((e, i) => (
+            <div key={e.id} style={{
+              display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10,
+              padding: "13px 16px", borderLeft: `2px solid ${COLORS.danger}`,
+              borderBottom: (i < atrasadosList.length - 1 || renovPendentes.length > 0) ? `1px solid ${COLORS.border}` : "none",
+            }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 13, color: COLORS.ink, fontWeight: 500 }}>{e.locatario}</div>
+                <div style={{ fontSize: 12, color: COLORS.neutral, marginTop: 1 }}>{e.livro?.titulo} · atrasado há {e.dias} {e.dias === 1 ? "dia" : "dias"}</div>
+              </div>
+              <Btn variant="ghost" style={{ flexShrink: 0, padding: "6px 12px", fontSize: 12 }} onClick={() => setRoute("emprestimos")}>Ver</Btn>
+            </div>
+          ))}
+          {renovPendentes.map((r, i) => {
+            const livro = livros.find((l) => l.id === r.livroId);
+            return (
+              <div key={r.id} style={{
+                display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10,
+                padding: "13px 16px", borderLeft: `2px solid ${COLORS.neutralLight}`,
+                borderBottom: i < renovPendentes.length - 1 ? `1px solid ${COLORS.border}` : "none",
+              }}>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: 13, color: COLORS.ink, fontWeight: 500 }}>{r.locatario}</div>
+                  <div style={{ fontSize: 12, color: COLORS.neutral, marginTop: 1 }}>pediu renovação de "{livro?.titulo}"</div>
+                </div>
+                <Btn variant="ghost" style={{ flexShrink: 0, padding: "6px 12px", fontSize: 12 }} onClick={() => setRoute("renovacoes")}>Avaliar</Btn>
+              </div>
+            );
+          })}
         </div>
       )}
+
+      <Eyebrow text="Visão geral do acervo" />
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 1, background: COLORS.border, border: `1px solid ${COLORS.border}`, borderRadius: 12, overflow: "hidden", marginTop: 4, marginBottom: 28 }}>
+        <div style={{ background: COLORS.bg, padding: "14px 16px 16px" }}>
+          <div style={{ fontSize: 10, color: COLORS.neutral, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 8 }}>Acervo</div>
+          <div style={{ fontSize: 24, fontWeight: 300, color: COLORS.ink }}>{total}</div>
+        </div>
+        <div style={{ background: COLORS.bg, padding: "14px 16px 16px" }}>
+          <div style={{ fontSize: 10, color: COLORS.neutral, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 8 }}>Empréstimos sem atraso</div>
+          <div style={{ fontSize: 24, fontWeight: 300, color: emDiaPct === 100 ? COLORS.success : COLORS.ink }}>{emDiaPct}%</div>
+        </div>
+        <div style={{ background: COLORS.bg, padding: "14px 16px 16px" }}>
+          <div style={{ fontSize: 10, color: COLORS.neutral, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 8 }}>Últimos 7 dias</div>
+          <div style={{ fontSize: 24, fontWeight: 300, color: COLORS.ink }}>+{novosUltimos7}</div>
+        </div>
+      </div>
+
+      <Eyebrow text="Empréstimos e leitores" />
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 1, background: COLORS.border, border: `1px solid ${COLORS.border}`, borderRadius: 12, overflow: "hidden", marginTop: 4, marginBottom: 22 }}>
+        <div style={{ background: COLORS.bg, padding: "14px 16px 16px" }}>
+          <div style={{ fontSize: 10, color: COLORS.neutral, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 8 }}>Empréstimos no período</div>
+          <div style={{ fontSize: 24, fontWeight: 300, color: COLORS.ink }}>{emprestimos.length}</div>
+        </div>
+        <div style={{ background: COLORS.bg, padding: "14px 16px 16px" }}>
+          <div style={{ fontSize: 10, color: COLORS.neutral, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 8 }}>Duração média</div>
+          <div style={{ fontSize: 24, fontWeight: 300, color: COLORS.ink }}>{duracaoMedia}d</div>
+        </div>
+        <div style={{ background: COLORS.bg, padding: "14px 16px 16px" }}>
+          <div style={{ fontSize: 10, color: COLORS.neutral, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 8 }}>Devolvido no prazo</div>
+          <div style={{ fontSize: 24, fontWeight: 300, color: taxaNoPrazo >= 80 ? COLORS.success : taxaNoPrazo >= 50 ? COLORS.ink : COLORS.danger }}>{taxaNoPrazo}%</div>
+        </div>
+        <div style={{ background: COLORS.bg, padding: "14px 16px 16px" }}>
+          <div style={{ fontSize: 10, color: COLORS.neutral, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 8 }}>Usuários cadastrados</div>
+          <div style={{ fontSize: 24, fontWeight: 300, color: COLORS.ink }}>{totalUsuarios}</div>
+          <div style={{ fontSize: 11, color: COLORS.neutral, marginTop: 2 }}>{totalLeitores} leitores</div>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 18 }}>
+        <RankingCard title="Livros mais emprestados" items={rankingLivros.map((r) => ({ label: r.livro?.titulo || "—", count: r.count }))} unit={(n) => n === 1 ? "empréstimo" : "empréstimos"} />
+        <RankingCard title="Leitores que mais pegaram livros" items={rankingLeitores.map((r) => ({ label: r.nome, count: r.count }))} unit={(n) => n === 1 ? "empréstimo" : "empréstimos"} />
+      </div>
+    </div>
+  );
+
+  // render leitor
+  return (
+    <div>
+      <Eyebrow text="Acervo Vivo" />
+      {proximo ? (
+        <div style={{ marginBottom: 22 }}>
+          <h1 style={{ fontFamily: "Inter, sans-serif", fontWeight: 300, fontSize: 24, margin: "0 0 4px", color: COLORS.ink, letterSpacing: "-0.01em" }}>
+            {proximo.dias < 0 ? <>Atrasado há {Math.abs(proximo.dias)} {Math.abs(proximo.dias) === 1 ? "dia" : "dias"}</> : proximo.dias === 0 ? "Devolução é hoje" : <>Devolver em {proximo.dias} {proximo.dias === 1 ? "dia" : "dias"}</>}
+          </h1>
+          <p style={{ fontSize: 14, color: COLORS.neutral, margin: 0 }}>"{proximo.livro?.titulo}" · até {diaSemanaCurto(proximo.dataDevolucao)}, {fmtDate(proximo.dataDevolucao)}</p>
+        </div>
+      ) : (
+        <h1 style={{ fontFamily: "Inter, sans-serif", fontWeight: 300, fontSize: 24, margin: "0 0 22px", color: COLORS.ink, letterSpacing: "-0.01em" }}>Olá, {ctx.auth.nome.split(" ")[0]}</h1>
+      )}
+
+      {meusEmprestimos.length === 0 ? (
+        <div style={{ border: `1px solid ${COLORS.border}`, borderRadius: 12, padding: "20px 18px", marginBottom: 18 }}>
+          <div style={{ fontSize: 14, color: COLORS.ink, fontWeight: 500, marginBottom: 4 }}>Você não tem nenhum livro emprestado.</div>
+          <div style={{ fontSize: 13, color: COLORS.neutral, marginBottom: 12 }}>Explore o acervo e peça seu próximo livro.</div>
+          <Btn variant="ghost" onClick={() => setRoute("livros")}>Ver catálogo</Btn>
+        </div>
+      ) : (
+        <div style={{ border: `1px solid ${COLORS.border}`, borderRadius: 12, overflow: "hidden", marginBottom: 18 }}>
+          {meusEmprestimos.map((e, i) => (
+            <div key={e.id} style={{
+              display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10,
+              padding: "13px 16px", borderLeft: `2px solid ${e.dias < 0 ? COLORS.danger : COLORS.neutralLight}`,
+              borderBottom: i < meusEmprestimos.length - 1 ? `1px solid ${COLORS.border}` : "none",
+            }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 13, color: COLORS.ink, fontWeight: 500 }}>{e.livro?.titulo}</div>
+                <div style={{ fontSize: 12, color: COLORS.neutral, marginTop: 1 }}>
+                  {e.dias < 0 ? `atrasado há ${Math.abs(e.dias)} dias` : e.dias === 0 ? "devolver hoje" : `devolver em ${e.dias} dias`}
+                </div>
+              </div>
+              <Btn variant="ghost" style={{ flexShrink: 0, padding: "6px 12px", fontSize: 12 }} onClick={() => setRoute("emprestimos")}>Ver</Btn>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {minhasRenovPendentes.length > 0 && (
+        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: COLORS.neutral, marginBottom: 18 }}>
+          <Clock size={14} />
+          {minhasRenovPendentes.length === 1 ? "1 renovação aguardando resposta do administrador." : `${minhasRenovPendentes.length} renovações aguardando resposta.`}
+        </div>
+      )}
+
+      {livroEmLeitura && (
+        <div>
+          <Eyebrow text="Continue lendo" />
+          <button onClick={() => setRoute("leitura")} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", border: `1px solid ${COLORS.border}`, borderRadius: 12, padding: "13px 16px", background: "#fff", cursor: "pointer", fontFamily: "Inter, sans-serif", marginTop: 4 }}>
+            <span style={{ fontSize: 13, color: COLORS.ink, fontWeight: 500 }}>{livroEmLeitura.titulo}</span>
+            <span style={{ fontSize: 12, color: COLORS.neutral }}>{emLeitura.progresso}% concluído</span>
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Eyebrow({ text }) {
+  return (
+    <div style={{ fontSize: 10, color: COLORS.neutral, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 6, fontFamily: "Inter, sans-serif" }}>
+      {text}
+    </div>
+  );
+}
+
+function RankingCard({ title, items, unit }) {
+  const max = items.length ? items[0].count : 1;
+  return (
+    <div>
+      <div style={{ fontSize: 12, color: COLORS.ink, fontWeight: 500, marginBottom: 10 }}>{title}</div>
+      <div style={{ border: `1px solid ${COLORS.border}`, borderRadius: 12, overflow: "hidden" }}>
+        {items.map((it, i) => (
+          <div key={it.label + i} style={{
+            display: "flex", alignItems: "center", gap: 10, padding: "9px 14px",
+            borderBottom: i < items.length - 1 ? `1px solid ${COLORS.border}` : "none",
+          }}>
+            <div style={{ fontSize: 11, color: COLORS.neutralLight, fontWeight: 600, width: 16, flexShrink: 0 }}>{i + 1}</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 12, color: COLORS.ink, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{it.label}</div>
+              <div style={{ height: 3, background: COLORS.bgAlt, borderRadius: 999, marginTop: 4, overflow: "hidden" }}>
+                <div style={{ width: `${Math.max(8, (it.count / max) * 100)}%`, height: "100%", background: COLORS.accent, borderRadius: 999 }} />
+              </div>
+            </div>
+            <div style={{ fontSize: 11, color: COLORS.neutral, flexShrink: 0, minWidth: 14, textAlign: "right" }}>{it.count}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -1745,7 +2046,14 @@ function EmprestimosScreen({ ctx }) {
   }
 
   function devolver(e) {
-    setEmprestimos((prev) => prev.map((x) => (x.id === e.id ? { ...x, status: "Devolvido" } : x)));
+    const agora = new Date().toISOString();
+    setEmprestimos((prev) => prev.map((x) => (x.id === e.id ? {
+      ...x,
+      status: "Devolvido",
+      dataDevolvido: agora,
+      devolvidoPor: auth.nome,
+      dataDevolucaoEfetiva: todayISO(),
+    } : x)));
     setLivros((prev) => prev.map((l) => (l.id === e.livroId ? { ...l, status: "Disponível" } : l)));
     setToReturn(null);
     showToast("Devolução registrada.");
@@ -1796,9 +2104,20 @@ function EmprestimosScreen({ ctx }) {
                 </div>
                 <p style={{ margin: "0 0 2px", fontSize: 13, color: COLORS.neutral }}>Para: {e.locatario}</p>
                 <p style={{ margin: "0 0 2px", fontSize: 13, color: COLORS.neutral }}>Empréstimo: {fmtDate(e.dataEmprestimo)}</p>
-                <p style={{ margin: "0 0 6px", fontSize: 13, color: COLORS.neutral }}>Devolução: {fmtDate(e.dataDevolucao)}</p>
+                <p style={{ margin: "0 0 6px", fontSize: 13, color: COLORS.neutral }}>Prazo: {fmtDate(e.dataDevolucao)}</p>
                 {e.observacoes && <p style={{ margin: "0 0 8px", fontSize: 12, fontStyle: "italic", color: COLORS.neutral }}>{e.observacoes}</p>}
                 {e.renovacao && <Badge tone="warn">Renovação {e.renovacao}</Badge>}
+                {e.status === "Devolvido" && e.dataDevolvido && (
+                  <div style={{
+                    marginTop: 8, background: COLORS.successBg,
+                    border: `1px solid ${COLORS.success}33`, borderRadius: 8,
+                    padding: "7px 11px", fontSize: 12, color: COLORS.success,
+                    display: "flex", alignItems: "center", gap: 6,
+                  }}>
+                    <CheckCircle2 size={13} />
+                    <span>Devolvido em {fmtDateTime(e.dataDevolvido)} · confirmado por <strong>{e.devolvidoPor}</strong></span>
+                  </div>
+                )}
                 {(e.status === "Ativo" || e.status === "Atrasado") && podeAgir && (
                   <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
                     {isAdmin && <Btn variant="subtle" icon={CheckCircle2} onClick={() => setToReturn(e)}>Devolver</Btn>}
@@ -2744,5 +3063,383 @@ function GrupoDetalhe({ grupo, setGrupos, auth, onBack }) {
         ))}
       </div>
     </div>
+  );
+}
+
+/* =========================================================================
+   SCREEN: GESTÃO DE USUÁRIOS (Admin)
+   ========================================================================= */
+function GestaoUsuariosScreen({ ctx }) {
+  const { usuarios, setUsuarios, emprestimos, livros, sendNotif, showToast, auth } = ctx;
+  const [query, setQuery] = useState("");
+  const [detailCpf, setDetailCpf] = useState(null);
+  const [editing, setEditing] = useState(null);
+  const [toDelete, setToDelete] = useState(null);
+  const [criando, setCriando] = useState(false);
+
+  const filtered = usuarios.filter((u) => {
+    const q = query.toLowerCase();
+    return !q || u.nome.toLowerCase().includes(q) || u.cpf.includes(q) || (u.email || "").toLowerCase().includes(q);
+  });
+
+  function toggleAtivo(u) {
+    if (u.cpf === auth.cpf) { showToast("Você não pode inativar sua própria conta."); return; }
+    const novoAtivo = u.ativo === false;
+    setUsuarios((prev) => prev.map((x) => x.cpf === u.cpf ? { ...x, ativo: novoAtivo } : x));
+    showToast(novoAtivo ? `${u.nome} reativado.` : `${u.nome} inativado.`);
+  }
+
+  function excluirUsuario(u) {
+    if (u.cpf === auth.cpf) { showToast("Você não pode excluir sua própria conta."); return; }
+    setUsuarios((prev) => prev.filter((x) => x.cpf !== u.cpf));
+    setToDelete(null);
+    showToast("Usuário excluído.");
+  }
+
+  function resetarSenha(u) {
+    const link = `https://acervovivo.app/redefinir/${uid("tk")}`;
+    sendNotif("Redefinição de senha", u.telefone || u.email || u.nome,
+      `Olá ${u.nome}, use o link para redefinir sua senha: ${link} (válido por 24h).`);
+    showToast(`Link de redefinição enviado para ${u.nome} (simulado).`);
+  }
+
+  function salvarEdicao(dados) {
+    setUsuarios((prev) => prev.map((u) => u.cpf === editing.cpf ? { ...u, ...dados } : u));
+    showToast("Dados do usuário atualizados.");
+    setEditing(null);
+  }
+
+
+  const detailUser = detailCpf ? usuarios.find((u) => u.cpf === detailCpf) : null;
+  if (detailUser) {
+    return (
+      <UsuarioDetalhe
+        usuario={detailUser}
+        emprestimos={emprestimos}
+        livros={livros}
+        onBack={() => setDetailCpf(null)}
+      />
+    );
+  }
+
+  return (
+    <div>
+      <PageTitle
+        title="Gestão de Usuários"
+        subtitle={`${usuarios.length} ${usuarios.length === 1 ? "usuário cadastrado" : "usuários cadastrados"}`}
+        action={<Btn icon={Plus} onClick={() => setCriando(true)}>Novo usuário</Btn>}
+      />
+      <SearchBar value={query} onChange={setQuery} placeholder="Buscar por nome, CPF ou e-mail..." />
+
+      {filtered.length === 0 ? (
+        <EmptyState icon={UsersRound} text="Nenhum usuário encontrado." />
+      ) : (
+        <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
+          {filtered.map((u) => {
+            const ativo = u.ativo !== false;
+            const isSelf = u.cpf === auth.cpf;
+            return (
+              <div key={u.cpf} style={{
+                background: "#fff", border: `1px solid ${COLORS.border}`,
+                borderRadius: 14, padding: 16, opacity: ativo ? 1 : 0.65,
+              }}>
+                <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+                  <div style={{
+                    width: 48, height: 48, borderRadius: "50%", flexShrink: 0,
+                    background: ativo ? COLORS.primary : COLORS.neutral,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    color: "#fff", fontFamily: "'Source Serif 4', serif", fontSize: 20, fontWeight: 700,
+                    overflow: "hidden",
+                  }}>
+                    {u.foto
+                      ? <img src={u.foto} alt={u.nome} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      : u.nome.charAt(0).toUpperCase()}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
+                      <h3 style={{ margin: 0, fontFamily: "'Source Serif 4', serif", fontSize: 17, color: COLORS.ink }}>{u.nome}</h3>
+                      <Badge tone={u.perfil === "administrador" ? "accent" : "neutral"}>{u.perfil}</Badge>
+                      {!ativo && <Badge tone="danger">Inativo</Badge>}
+                      {isSelf && <Badge tone="success">Você</Badge>}
+                    </div>
+                    <p style={{ margin: "0 0 2px", fontSize: 13, color: COLORS.neutral }}>CPF: {u.cpf}</p>
+                    {u.email && <p style={{ margin: "0 0 2px", fontSize: 13, color: COLORS.neutral }}>{u.email}</p>}
+                    {u.telefone && <p style={{ margin: 0, fontSize: 13, color: COLORS.neutral }}>{u.telefone}</p>}
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
+                  <Btn variant="ghost" icon={History} onClick={() => setDetailCpf(u.cpf)}>Histórico</Btn>
+                  <Btn variant="ghost" icon={Edit2} onClick={() => setEditing(u)}>Editar</Btn>
+                  {!isSelf && (
+                    <>
+                      <Btn variant="ghost" icon={Key} onClick={() => resetarSenha(u)}>Resetar senha</Btn>
+                      <Btn
+                        variant="ghost"
+                        icon={ativo ? UserMinus : UserCheck}
+                        onClick={() => toggleAtivo(u)}
+                        style={{ color: ativo ? COLORS.warn : COLORS.success }}
+                      >
+                        {ativo ? "Inativar" : "Reativar"}
+                      </Btn>
+                      <Btn variant="ghost" icon={Trash2} onClick={() => setToDelete(u)} style={{ color: COLORS.danger }}>Excluir</Btn>
+                    </>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {editing && <UsuarioEditForm usuario={editing} onSave={salvarEdicao} onClose={() => setEditing(null)} isAdmin usuariosExistentes={usuarios} />}
+      {criando && (
+        <NovoUsuarioForm
+          usuariosExistentes={usuarios}
+          onSave={(novo) => {
+            setUsuarios((prev) => [...prev, novo]);
+            setCriando(false);
+            const link = `https://acervovivo.app/primeiro-acesso/${novo.tokenSenha}`;
+            const msg = `Olá ${novo.nome}! Sua conta no Acervo Vivo foi criada. Acesse o link para definir sua senha: ${link} (válido por 48h). Em caso de dúvidas, fale com o administrador.`;
+            if (novo.email) sendNotif("Convite Acervo Vivo", novo.email, msg);
+            if (novo.telefone) sendNotif("Convite Acervo Vivo", novo.telefone, msg);
+            showToast(`Usuário "${novo.nome}" criado. Convite enviado por ${novo.email && novo.telefone ? "e-mail e WhatsApp/SMS" : novo.email ? "e-mail" : "WhatsApp/SMS"}.`);
+          }}
+          onClose={() => setCriando(false)}
+        />
+      )}
+      {toDelete && (
+        <Confirm
+          text={`Excluir o usuário "${toDelete.nome}"? Esta ação não pode ser desfeita.`}
+          onConfirm={() => excluirUsuario(toDelete)}
+          onCancel={() => setToDelete(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+function UsuarioDetalhe({ usuario, emprestimos, livros, onBack }) {
+  const primeiroNome = usuario.nome.split(" ")[0].toLowerCase();
+  const historico = emprestimos
+    .filter((e) => e.locatario.toLowerCase().includes(primeiroNome))
+    .sort((a, b) => new Date(b.dataEmprestimo) - new Date(a.dataEmprestimo));
+
+  const ativo = usuario.ativo !== false;
+
+  function corDot(status) {
+    if (status === "Devolvido") return COLORS.success;
+    if (status === "Atrasado") return COLORS.danger;
+    return COLORS.warn;
+  }
+
+  return (
+    <div>
+      <button onClick={onBack} style={{ background: "none", border: "none", display: "flex", alignItems: "center", gap: 6, color: COLORS.neutral, cursor: "pointer", marginBottom: 14, fontSize: 13, padding: 0 }}>
+        <ArrowLeft size={15} /> Voltar para Usuários
+      </button>
+
+      <div style={{ display: "flex", gap: 20, alignItems: "center", marginBottom: 28, padding: 20, background: "#fff", border: `1px solid ${COLORS.border}`, borderRadius: 16, flexWrap: "wrap" }}>
+        <div style={{
+          width: 72, height: 72, borderRadius: "50%", flexShrink: 0,
+          background: ativo ? COLORS.primary : COLORS.neutral,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          color: "#fff", fontFamily: "'Source Serif 4', serif", fontSize: 30, fontWeight: 700, overflow: "hidden",
+        }}>
+          {usuario.foto
+            ? <img src={usuario.foto} alt={usuario.nome} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            : usuario.nome.charAt(0).toUpperCase()}
+        </div>
+        <div style={{ flex: 1, minWidth: 180 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 6 }}>
+            <h1 style={{ fontFamily: "'Source Serif 4', serif", fontSize: 24, margin: 0, color: COLORS.primaryDark }}>{usuario.nome}</h1>
+            <Badge tone={usuario.perfil === "administrador" ? "accent" : "neutral"}>{usuario.perfil}</Badge>
+            {!ativo && <Badge tone="danger">Inativo</Badge>}
+          </div>
+          <p style={{ margin: "0 0 2px", fontSize: 13, color: COLORS.neutral }}>CPF: {usuario.cpf}</p>
+          {usuario.email && <p style={{ margin: "0 0 2px", fontSize: 13, color: COLORS.neutral }}>{usuario.email}</p>}
+          {usuario.telefone && <p style={{ margin: 0, fontSize: 13, color: COLORS.neutral }}>{usuario.telefone}</p>}
+        </div>
+        <div style={{ textAlign: "center", padding: "12px 20px", background: COLORS.bgAlt, borderRadius: 12 }}>
+          <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: 32, fontWeight: 700, color: COLORS.primaryDark, lineHeight: 1 }}>{historico.length}</div>
+          <div style={{ fontSize: 12, color: COLORS.neutral, marginTop: 4 }}>empréstimo(s)</div>
+        </div>
+      </div>
+
+      <Section title="Linha do tempo de empréstimos">
+        {historico.length === 0 ? (
+          <p style={{ fontSize: 13, color: COLORS.neutral }}>Nenhum empréstimo registrado para este usuário.</p>
+        ) : (
+          <div style={{ position: "relative", paddingLeft: 28 }}>
+            <div style={{ position: "absolute", left: 9, top: 10, bottom: 10, width: 2, background: COLORS.border }} />
+            {historico.map((e, i) => {
+              const livro = livros.find((l) => l.id === e.livroId);
+              const cor = corDot(e.status);
+              return (
+                <div key={e.id} style={{ position: "relative", marginBottom: i < historico.length - 1 ? 20 : 0 }}>
+                  <div style={{
+                    position: "absolute", left: -28, top: 14,
+                    width: 14, height: 14, borderRadius: "50%",
+                    background: cor, border: "2px solid #fff",
+                    boxShadow: `0 0 0 2px ${cor}44`, zIndex: 1,
+                  }} />
+                  <div style={{ background: "#fff", border: `1px solid ${COLORS.border}`, borderRadius: 12, padding: "12px 14px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, flexWrap: "wrap" }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: 15, fontWeight: 600, color: COLORS.ink, marginBottom: 4 }}>
+                          {livro?.titulo || "Livro removido"}
+                        </div>
+                        <div style={{ fontSize: 12, color: COLORS.neutral }}>
+                          Empréstimo: {fmtDate(e.dataEmprestimo)} · Prazo: {fmtDate(e.dataDevolucao)}
+                        </div>
+                        {e.dataDevolvido && (
+                          <div style={{ fontSize: 12, color: COLORS.success, marginTop: 2 }}>
+                            Devolvido em {fmtDateTime(e.dataDevolvido)} · por {e.devolvidoPor}
+                          </div>
+                        )}
+                        {e.observacoes && (
+                          <div style={{ fontSize: 12, fontStyle: "italic", color: COLORS.neutral, marginTop: 2 }}>{e.observacoes}</div>
+                        )}
+                      </div>
+                      <StatusBadge status={e.status} />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </Section>
+    </div>
+  );
+}
+
+function UsuarioEditForm({ usuario, onSave, onClose, isAdmin = false, usuariosExistentes = [] }) {
+  const [cpf, setCpf] = useState(usuario.cpf || "");
+  const [nome, setNome] = useState(usuario.nome || "");
+  const [email, setEmail] = useState(usuario.email || "");
+  const [telefone, setTelefone] = useState(usuario.telefone || "");
+  const [perfil, setPerfil] = useState(usuario.perfil || "leitor");
+  const [senha, setSenha] = useState("");
+  const [err, setErr] = useState("");
+
+  function submit(e) {
+    e.preventDefault();
+    if (!nome.trim()) { setErr("O nome é obrigatório."); return; }
+    if (isAdmin) {
+      const cpfLimpo = cpf.replace(/\D/g, "");
+      if (!cpfLimpo || cpfLimpo.length !== 11) { setErr("CPF deve ter 11 dígitos."); return; }
+      if (cpfLimpo !== usuario.cpf && usuariosExistentes.some((u) => u.cpf === cpfLimpo)) {
+        setErr("Já existe outro usuário com este CPF.");
+        return;
+      }
+    }
+    const dados = { cpf: isAdmin ? cpf.replace(/\D/g, "") : usuario.cpf, nome: nome.trim(), email: email.trim(), telefone: telefone.trim(), perfil };
+    if (senha.trim()) dados.senha = senha.trim();
+    onSave(dados);
+  }
+
+  return (
+    <Modal title={`Editar: ${usuario.nome}`} onClose={onClose} width={480}>
+      <form onSubmit={submit}>
+        <Field
+          label="CPF"
+          required={isAdmin}
+          hint={isAdmin ? "Atenção: alterar o CPF muda o identificador único do usuário." : undefined}
+        >
+          {isAdmin ? (
+            <Input
+              value={cpf}
+              onChange={(e) => { setCpf(e.target.value); setErr(""); }}
+              placeholder="000.000.000-00"
+              maxLength={14}
+            />
+          ) : (
+            <div style={{ padding: "9px 12px", background: COLORS.bgAlt, borderRadius: 8, fontSize: 14, color: COLORS.neutral, border: `1px solid ${COLORS.border}` }}>
+              {usuario.cpf}
+            </div>
+          )}
+        </Field>
+        <Field label="Nome" required>
+          <Input value={nome} onChange={(e) => setNome(e.target.value)} />
+        </Field>
+        <Field label="E-mail">
+          <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        </Field>
+        <Field label="Telefone">
+          <Input value={telefone} onChange={(e) => setTelefone(e.target.value)} />
+        </Field>
+        <Field label="Perfil">
+          <Select value={perfil} onChange={(e) => setPerfil(e.target.value)}>
+            <option value="leitor">Leitor</option>
+            <option value="administrador">Administrador</option>
+          </Select>
+        </Field>
+        <Field label="Nova senha" hint="Deixe em branco para manter a senha atual.">
+          <Input type="password" value={senha} onChange={(e) => setSenha(e.target.value)} placeholder="••••••" />
+        </Field>
+        {err && <div style={{ color: COLORS.danger, fontSize: 13, marginBottom: 10 }}>{err}</div>}
+        <Btn type="submit" style={{ width: "100%", justifyContent: "center" }}>Salvar alterações</Btn>
+      </form>
+    </Modal>
+  );
+}
+
+function NovoUsuarioForm({ usuariosExistentes, onSave, onClose }) {
+  const [cpf, setCpf] = useState("");
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [telefone, setTelefone] = useState("");
+  const [perfil, setPerfil] = useState("leitor");
+  const [err, setErr] = useState("");
+
+  function submit(e) {
+    e.preventDefault();
+    const cpfLimpo = cpf.replace(/\D/g, "");
+    if (!cpfLimpo || cpfLimpo.length !== 11) { setErr("CPF deve ter 11 dígitos."); return; }
+    if (usuariosExistentes.some((u) => u.cpf === cpfLimpo)) { setErr("Já existe um usuário com este CPF."); return; }
+    if (!nome.trim()) { setErr("O nome é obrigatório."); return; }
+    if (!email.trim() && !telefone.trim()) { setErr("Informe ao menos e-mail ou telefone para envio do convite."); return; }
+    onSave({
+      cpf: cpfLimpo,
+      nome: nome.trim(),
+      email: email.trim(),
+      telefone: telefone.trim(),
+      perfil,
+      senha: null,
+      pendingSenha: true,
+      tokenSenha: uid("tk"),
+      ativo: true,
+    });
+  }
+
+  return (
+    <Modal title="Novo usuário" onClose={onClose} width={480}>
+      <form onSubmit={submit}>
+        <div style={{ padding: "10px 14px", background: "#EFF6FF", border: "1px solid #BFDBFE", borderRadius: 10, marginBottom: 18, fontSize: 13, color: "#1E40AF", lineHeight: 1.5 }}>
+          O usuário receberá um convite por <strong>e-mail</strong> e <strong>WhatsApp/SMS</strong> com um link para definir a própria senha no primeiro acesso.
+        </div>
+        <Field label="CPF" required hint="11 dígitos — identificador único, não pode ser alterado depois.">
+          <Input value={cpf} onChange={(e) => setCpf(e.target.value)} placeholder="000.000.000-00" maxLength={14} />
+        </Field>
+        <Field label="Nome completo" required>
+          <Input value={nome} onChange={(e) => setNome(e.target.value)} />
+        </Field>
+        <Field label="E-mail" hint="Usado para envio do convite.">
+          <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        </Field>
+        <Field label="Telefone (WhatsApp/SMS)" hint="Usado para envio do convite.">
+          <Input value={telefone} onChange={(e) => setTelefone(e.target.value)} placeholder="+55 (00) 00000-0000" />
+        </Field>
+        <Field label="Perfil">
+          <Select value={perfil} onChange={(e) => setPerfil(e.target.value)}>
+            <option value="leitor">Leitor</option>
+            <option value="administrador">Administrador</option>
+          </Select>
+        </Field>
+        {err && <div style={{ color: COLORS.danger, fontSize: 13, marginBottom: 10 }}>{err}</div>}
+        <Btn type="submit" style={{ width: "100%", justifyContent: "center" }}>Criar e enviar convite</Btn>
+      </form>
+    </Modal>
   );
 }
