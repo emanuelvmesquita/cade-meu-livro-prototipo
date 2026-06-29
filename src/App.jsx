@@ -6,7 +6,7 @@ import {
   Send, Clock, CheckCircle2, XCircle, BookMarked,
   StickyNote, MessageCircle, UsersRound, ShieldCheck, History, Image as ImageIcon,
   LayoutGrid, List, BookX,
-  UserMinus, UserCheck, Key
+  UserMinus, UserCheck, Key, Bookmark
 } from "lucide-react";
 
 /* =========================================================================
@@ -668,6 +668,7 @@ const NAV_ITEMS = [
   { key: "emprestimos", label: "Empréstimos", icon: RefreshCw },
   { key: "leitura", label: "Leitura", icon: BookMarked },
   { key: "desejos", label: "Desejos", icon: Heart },
+  { key: "minhabiblioteca", label: "Minha Biblioteca", icon: Bookmark },
   { key: "anotacoes", label: "Anotações", icon: StickyNote },
   { key: "comunidade", label: "Comunidade", icon: UsersRound },
 ];
@@ -909,6 +910,7 @@ function Router({ route, setRoute, ctx }) {
     case "emprestimos": return <EmprestimosScreen ctx={ctx} />;
     case "leitura": return <LeituraScreen ctx={ctx} />;
     case "desejos": return <ListaDesejosScreen ctx={ctx} setRoute={setRoute} />;
+    case "minhabiblioteca": return <MinhaBibliotecaScreen ctx={ctx} />;
     case "anotacoes": return <AnotacoesScreen ctx={ctx} />;
     case "comunidade": return <ComunidadeScreen ctx={ctx} />;
     case "perfil": return <PerfilScreen ctx={ctx} />;
@@ -3439,6 +3441,371 @@ function NovoUsuarioForm({ usuariosExistentes, onSave, onClose }) {
         </Field>
         {err && <div style={{ color: COLORS.danger, fontSize: 13, marginBottom: 10 }}>{err}</div>}
         <Btn type="submit" style={{ width: "100%", justifyContent: "center" }}>Criar e enviar convite</Btn>
+      </form>
+    </Modal>
+  );
+}
+
+/* =========================================================================
+   SCREEN: MINHA BIBLIOTECA
+   ========================================================================= */
+function MinhaBibliotecaScreen({ ctx }) {
+  const { auth, showToast } = ctx;
+  const [tab, setTab] = useState("livros");
+  const [livros, setLivros] = useState([]);
+  const [emprestimos, setEmprestimos] = useState([]);
+  const [booted, setBooted] = useState(false);
+  const [formLivro, setFormLivro] = useState(null);
+  const [formEmp, setFormEmp] = useState(null);
+  const [toDelete, setToDelete] = useState(null);
+  const [toDevolver, setToDevolver] = useState(null);
+  const [query, setQuery] = useState("");
+
+  const kLivros = `minhabiblioteca:livros:${auth.cpf}`;
+  const kEmp = `minhabiblioteca:emprestimos:${auth.cpf}`;
+
+  useEffect(() => {
+    Promise.all([loadKey(kLivros, []), loadKey(kEmp, [])]).then(([l, e]) => {
+      setLivros(Array.isArray(l) ? l : []);
+      setEmprestimos(Array.isArray(e) ? e : []);
+      setBooted(true);
+    });
+  }, []);
+
+  useEffect(() => { if (booted) saveKey(kLivros, livros); }, [livros, booted]);
+  useEffect(() => { if (booted) saveKey(kEmp, emprestimos); }, [emprestimos, booted]);
+
+  useEffect(() => {
+    if (!booted) return;
+    const today = todayISO();
+    setEmprestimos((prev) => prev.map((e) =>
+      e.status === "Ativo" && e.dataDevolucao < today ? { ...e, status: "Atrasado" } : e
+    ));
+  }, [booted]);
+
+  function salvarLivro(dados) {
+    if (formLivro?.id) {
+      setLivros((prev) => prev.map((l) => l.id === formLivro.id ? { ...l, ...dados } : l));
+      showToast("Livro atualizado.");
+    } else {
+      setLivros((prev) => [...prev, { ...dados, id: uid("PL"), status: "Disponível" }]);
+      showToast("Livro adicionado à sua biblioteca.");
+    }
+    setFormLivro(null);
+  }
+
+  function excluirLivro(l) {
+    if (emprestimos.some((e) => e.livroId === l.id && e.status !== "Devolvido")) {
+      showToast("Não é possível excluir: livro tem empréstimo ativo."); return;
+    }
+    setLivros((prev) => prev.filter((x) => x.id !== l.id));
+    setToDelete(null);
+    showToast("Livro removido.");
+  }
+
+  function salvarEmprestimo(dados) {
+    setEmprestimos((prev) => [...prev, { ...dados, id: uid("PE"), status: "Ativo" }]);
+    setLivros((prev) => prev.map((l) => l.id === dados.livroId ? { ...l, status: "Emprestado" } : l));
+    showToast(`Empréstimo registrado para ${dados.amigo}.`);
+    setFormEmp(null);
+  }
+
+  function devolver(e) {
+    setEmprestimos((prev) => prev.map((x) => x.id === e.id ? { ...x, status: "Devolvido", dataDevolvido: todayISO() } : x));
+    setLivros((prev) => prev.map((l) => l.id === e.livroId ? { ...l, status: "Disponível" } : l));
+    setToDevolver(null);
+    showToast("Devolução registrada.");
+  }
+
+  const livrosFiltrados = livros.filter((l) => {
+    if (!query) return true;
+    const q = query.toLowerCase();
+    return l.titulo.toLowerCase().includes(q) || (l.autor || "").toLowerCase().includes(q);
+  });
+  const livrosDisponiveis = livros.filter((l) => l.status === "Disponível");
+  const empAtivos = emprestimos.filter((e) => e.status !== "Devolvido").length;
+  const empAtrasados = emprestimos.filter((e) => e.status === "Atrasado").length;
+
+  return (
+    <div>
+      <PageTitle
+        title="Minha Biblioteca"
+        subtitle={`${livros.length} ${livros.length === 1 ? "livro" : "livros"} no seu acervo pessoal`}
+      />
+
+      <div style={{ display: "inline-flex", border: `1px solid ${COLORS.border}`, borderRadius: 8, overflow: "hidden", marginBottom: 20 }}>
+        {[
+          { key: "livros", label: "Meus Livros" },
+          { key: "emprestimos", label: `Empréstimos${empAtivos > 0 ? ` (${empAtivos})` : ""}` },
+        ].map((t) => (
+          <button key={t.key} onClick={() => setTab(t.key)} style={{
+            border: "none", padding: "8px 16px", fontSize: 13, fontWeight: 500, cursor: "pointer",
+            background: tab === t.key ? COLORS.primary : "#fff",
+            color: tab === t.key ? "#fff" : COLORS.neutral,
+            fontFamily: "Inter, sans-serif",
+          }}>{t.label}</button>
+        ))}
+      </div>
+
+      {/* ── ABA: LIVROS ─────────────────────────────────────────────────── */}
+      {tab === "livros" && (
+        <div>
+          <div style={{ display: "flex", gap: 10, marginBottom: 16, alignItems: "center" }}>
+            <SearchBar value={query} onChange={setQuery} placeholder="Buscar por título ou autor…" />
+            <Btn icon={Plus} onClick={() => setFormLivro({})}>Adicionar</Btn>
+          </div>
+
+          {empAtrasados > 0 && (
+            <div style={{ marginBottom: 16, background: COLORS.dangerBg, border: `1px solid ${COLORS.danger}33`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: COLORS.danger, display: "flex", alignItems: "center", gap: 8 }}>
+              <AlertTriangle size={15} />
+              {empAtrasados} empréstimo(s) pessoal(is) em atraso.
+              <button onClick={() => setTab("emprestimos")} style={{ background: "none", border: "none", color: COLORS.danger, fontWeight: 700, cursor: "pointer", textDecoration: "underline", fontFamily: "Inter, sans-serif", fontSize: 13 }}>Ver</button>
+            </div>
+          )}
+
+          {livrosFiltrados.length === 0 ? (
+            <EmptyState icon={Bookmark} text={query ? "Nenhum livro encontrado." : "Sua biblioteca pessoal está vazia. Adicione o primeiro livro!"} />
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 14 }}>
+              {livrosFiltrados.map((l) => {
+                const empAtivo = emprestimos.find((e) => e.livroId === l.id && e.status !== "Devolvido");
+                return (
+                  <div key={l.id} style={{ background: "#fff", border: `1px solid ${COLORS.border}`, borderRadius: 14, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+                    <div style={{ height: 100, background: COLORS.bgAlt, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                      {l.foto
+                        ? <img src={l.foto} alt={l.titulo} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        : <BookOpen size={32} color={COLORS.neutralLight} />}
+                      <div style={{ position: "absolute", top: 8, right: 8 }}>
+                        <StatusBadge status={l.status} />
+                      </div>
+                    </div>
+                    <div style={{ padding: "10px 12px", flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: COLORS.ink, lineHeight: 1.3 }}>{l.titulo}</div>
+                      <div style={{ fontSize: 12, color: COLORS.neutral }}>{l.autor}</div>
+                      {empAtivo && <div style={{ fontSize: 11, color: COLORS.warn, marginTop: 2 }}>→ {empAtivo.amigo}</div>}
+                    </div>
+                    <div style={{ borderTop: `1px solid ${COLORS.border}`, padding: "8px 12px", display: "flex", gap: 0 }}>
+                      <button onClick={() => setFormLivro(l)} style={{ flex: 1, background: "none", border: "none", cursor: "pointer", fontSize: 12, color: COLORS.primary, fontFamily: "Inter, sans-serif", fontWeight: 500, padding: "4px 0" }}>Editar</button>
+                      {l.status === "Disponível" && (
+                        <button onClick={() => setFormEmp({ livroId: l.id })} style={{ flex: 1, background: "none", border: "none", cursor: "pointer", fontSize: 12, color: COLORS.accent, fontFamily: "Inter, sans-serif", fontWeight: 500, padding: "4px 0" }}>Emprestar</button>
+                      )}
+                      <button onClick={() => setToDelete(l)} style={{ flex: 1, background: "none", border: "none", cursor: "pointer", fontSize: 12, color: COLORS.danger, fontFamily: "Inter, sans-serif", fontWeight: 500, padding: "4px 0" }}>Excluir</button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── ABA: EMPRÉSTIMOS ────────────────────────────────────────────── */}
+      {tab === "emprestimos" && (
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <div style={{ fontSize: 13, color: COLORS.neutral }}>
+              {emprestimos.length === 0 ? "Nenhum empréstimo registrado." : `${emprestimos.length} empréstimo(s) no histórico`}
+            </div>
+            <Btn icon={Plus} onClick={() => setFormEmp({})} disabled={livrosDisponiveis.length === 0}>Novo</Btn>
+          </div>
+
+          {livrosDisponiveis.length === 0 && livros.length > 0 && (
+            <div style={{ marginBottom: 16, background: COLORS.warnBg, border: `1px solid ${COLORS.warn}33`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: COLORS.warn }}>
+              Todos os seus livros estão emprestados no momento.
+            </div>
+          )}
+
+          {emprestimos.length === 0 ? (
+            <EmptyState icon={RefreshCw} text="Nenhum empréstimo pessoal registrado ainda." />
+          ) : (
+            <div style={{ display: "grid", gap: 12 }}>
+              {[...emprestimos]
+                .sort((a, b) => {
+                  const ord = { Atrasado: 0, Ativo: 1, Devolvido: 2 };
+                  return (ord[a.status] ?? 3) - (ord[b.status] ?? 3) || b.dataEmprestimo.localeCompare(a.dataEmprestimo);
+                })
+                .map((e) => {
+                  const livro = livros.find((l) => l.id === e.livroId);
+                  const atrasadoDias = e.status === "Atrasado" ? diffDays(e.dataDevolucao, todayISO()) : 0;
+                  return (
+                    <div key={e.id} style={{
+                      background: "#fff",
+                      border: `1px solid ${e.status === "Atrasado" ? COLORS.danger + "55" : COLORS.border}`,
+                      borderLeft: `3px solid ${e.status === "Atrasado" ? COLORS.danger : e.status === "Devolvido" ? COLORS.success : COLORS.neutralLight}`,
+                      borderRadius: 12, padding: "14px 16px",
+                    }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, flexWrap: "wrap" }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: 15, fontWeight: 600, color: COLORS.ink, marginBottom: 2 }}>
+                            {livro?.titulo || "Livro removido"}
+                          </div>
+                          <div style={{ fontSize: 13, color: COLORS.neutral }}>
+                            <strong style={{ color: COLORS.ink }}>{e.amigo}</strong> · {fmtDate(e.dataEmprestimo)} → {fmtDate(e.dataDevolucao)}
+                          </div>
+                          {e.status === "Atrasado" && (
+                            <div style={{ fontSize: 12, color: COLORS.danger, marginTop: 4 }}>Atrasado há {atrasadoDias} {atrasadoDias === 1 ? "dia" : "dias"}</div>
+                          )}
+                          {e.status === "Devolvido" && e.dataDevolvido && (
+                            <div style={{ fontSize: 12, color: COLORS.success, marginTop: 4 }}>Devolvido em {fmtDate(e.dataDevolvido)}</div>
+                          )}
+                          {e.observacoes && (
+                            <div style={{ fontSize: 12, color: COLORS.neutral, fontStyle: "italic", marginTop: 4 }}>{e.observacoes}</div>
+                          )}
+                        </div>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-end", flexShrink: 0 }}>
+                          <StatusBadge status={e.status} />
+                          {e.status !== "Devolvido" && (
+                            <button onClick={() => setToDevolver(e)} style={{
+                              background: COLORS.successBg, border: `1px solid ${COLORS.success}44`,
+                              borderRadius: 6, padding: "5px 10px", fontSize: 12, color: COLORS.success,
+                              cursor: "pointer", fontFamily: "Inter, sans-serif", fontWeight: 600,
+                            }}>
+                              Devolvido ✓
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {formLivro !== null && (
+        <MeuLivroForm livro={formLivro?.id ? formLivro : null} onSave={salvarLivro} onClose={() => setFormLivro(null)} />
+      )}
+      {formEmp !== null && (
+        <MeuEmprestimoForm livroIdInicial={formEmp?.livroId || null} livrosDisponiveis={livrosDisponiveis} onSave={salvarEmprestimo} onClose={() => setFormEmp(null)} />
+      )}
+      {toDelete && (
+        <Confirm text={`Excluir "${toDelete.titulo}" da sua biblioteca pessoal?`} onConfirm={() => excluirLivro(toDelete)} onCancel={() => setToDelete(null)} />
+      )}
+      {toDevolver && (
+        <Confirm
+          text={`Confirmar devolução de "${livros.find((l) => l.id === toDevolver.livroId)?.titulo}" por ${toDevolver.amigo}?`}
+          onConfirm={() => devolver(toDevolver)}
+          onCancel={() => setToDevolver(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+function MeuLivroForm({ livro, onSave, onClose }) {
+  const [titulo, setTitulo] = useState(livro?.titulo || "");
+  const [autor, setAutor] = useState(livro?.autor || "");
+  const [isbn, setIsbn] = useState(livro?.isbn || "");
+  const [ano, setAno] = useState(livro?.ano || "");
+  const [editora, setEditora] = useState(livro?.editora || "");
+  const [conservacao, setConservacao] = useState(livro?.conservacao || "Bom");
+  const [foto, setFoto] = useState(livro?.foto || null);
+  const [err, setErr] = useState("");
+  const fileRef = useRef(null);
+
+  function handleFoto(ev) {
+    const f = ev.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = (e) => setFoto(e.target.result);
+    r.readAsDataURL(f);
+  }
+
+  function submit(ev) {
+    ev.preventDefault();
+    if (!titulo.trim()) { setErr("O título é obrigatório."); return; }
+    if (!autor.trim()) { setErr("O autor é obrigatório."); return; }
+    onSave({ titulo: titulo.trim(), autor: autor.trim(), isbn: isbn.trim(), ano: ano.trim(), editora: editora.trim(), conservacao, foto });
+  }
+
+  return (
+    <Modal title={livro ? "Editar livro" : "Adicionar livro"} onClose={onClose} width={480}>
+      <form onSubmit={submit}>
+        <Field label="Título" required>
+          <Input value={titulo} onChange={(e) => setTitulo(e.target.value)} />
+        </Field>
+        <Field label="Autor" required>
+          <Input value={autor} onChange={(e) => setAutor(e.target.value)} />
+        </Field>
+        <Field label="ISBN">
+          <Input value={isbn} onChange={(e) => setIsbn(e.target.value)} placeholder="978-…" />
+        </Field>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <Field label="Ano">
+            <Input value={ano} onChange={(e) => setAno(e.target.value)} placeholder="2024" maxLength={4} />
+          </Field>
+          <Field label="Conservação">
+            <Select value={conservacao} onChange={(e) => setConservacao(e.target.value)}>
+              {["Ótimo", "Bom", "Regular", "Ruim"].map((c) => <option key={c}>{c}</option>)}
+            </Select>
+          </Field>
+        </div>
+        <Field label="Editora">
+          <Input value={editora} onChange={(e) => setEditora(e.target.value)} />
+        </Field>
+        <Field label="Capa (opcional)">
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            {foto && <img src={foto} alt="capa" style={{ width: 44, height: 60, objectFit: "cover", borderRadius: 6, border: `1px solid ${COLORS.border}` }} />}
+            <Btn type="button" variant="ghost" icon={Camera} onClick={() => fileRef.current?.click()}>
+              {foto ? "Trocar" : "Escolher imagem"}
+            </Btn>
+            {foto && <button type="button" onClick={() => setFoto(null)} style={{ background: "none", border: "none", color: COLORS.danger, cursor: "pointer", fontSize: 12, fontFamily: "Inter, sans-serif" }}>Remover</button>}
+          </div>
+          <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleFoto} />
+        </Field>
+        {err && <div style={{ color: COLORS.danger, fontSize: 13, marginBottom: 10 }}>{err}</div>}
+        <Btn type="submit" style={{ width: "100%", justifyContent: "center" }}>
+          {livro ? "Salvar alterações" : "Adicionar à minha biblioteca"}
+        </Btn>
+      </form>
+    </Modal>
+  );
+}
+
+function MeuEmprestimoForm({ livroIdInicial, livrosDisponiveis, onSave, onClose }) {
+  const [livroId, setLivroId] = useState(livroIdInicial || livrosDisponiveis[0]?.id || "");
+  const [amigo, setAmigo] = useState("");
+  const [dataEmprestimo, setDataEmprestimo] = useState(todayISO());
+  const [dataDevolucao, setDataDevolucao] = useState(addDays(todayISO(), 14));
+  const [observacoes, setObservacoes] = useState("");
+  const [err, setErr] = useState("");
+
+  function submit(ev) {
+    ev.preventDefault();
+    if (!livroId) { setErr("Selecione um livro."); return; }
+    if (!amigo.trim()) { setErr("Informe o nome do amigo ou familiar."); return; }
+    if (dataDevolucao <= dataEmprestimo) { setErr("A data de devolução deve ser posterior à data do empréstimo."); return; }
+    onSave({ livroId, amigo: amigo.trim(), dataEmprestimo, dataDevolucao, observacoes: observacoes.trim() });
+  }
+
+  return (
+    <Modal title="Registrar empréstimo pessoal" onClose={onClose} width={480}>
+      <form onSubmit={submit}>
+        <div style={{ padding: "10px 14px", background: COLORS.bgAlt, borderRadius: 10, marginBottom: 16, fontSize: 13, color: COLORS.neutral }}>
+          Empréstimos pessoais não enviam notificações — são registros só para você.
+        </div>
+        <Field label="Livro" required>
+          <Select value={livroId} onChange={(e) => setLivroId(e.target.value)}>
+            {livrosDisponiveis.map((l) => <option key={l.id} value={l.id}>{l.titulo}</option>)}
+          </Select>
+        </Field>
+        <Field label="Emprestado para" required hint="Nome do amigo ou familiar.">
+          <Input value={amigo} onChange={(e) => setAmigo(e.target.value)} placeholder="Ex: João Silva" />
+        </Field>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <Field label="Data do empréstimo" required>
+            <Input type="date" value={dataEmprestimo} onChange={(e) => setDataEmprestimo(e.target.value)} />
+          </Field>
+          <Field label="Prazo de devolução" required>
+            <Input type="date" value={dataDevolucao} onChange={(e) => setDataDevolucao(e.target.value)} />
+          </Field>
+        </div>
+        <Field label="Observações">
+          <Input value={observacoes} onChange={(e) => setObservacoes(e.target.value)} placeholder="Opcional…" />
+        </Field>
+        {err && <div style={{ color: COLORS.danger, fontSize: 13, marginBottom: 10 }}>{err}</div>}
+        <Btn type="submit" style={{ width: "100%", justifyContent: "center" }}>Registrar empréstimo</Btn>
       </form>
     </Modal>
   );
