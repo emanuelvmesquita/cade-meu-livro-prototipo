@@ -6,7 +6,7 @@ import {
   Send, Clock, CheckCircle2, XCircle, BookMarked,
   StickyNote, MessageCircle, UsersRound, ShieldCheck, History, Image as ImageIcon,
   LayoutGrid, List, BookX,
-  UserMinus, UserCheck, Key, Bookmark
+  UserMinus, UserCheck, Key, Bookmark, ThumbsUp, UserPlus, Layers
 } from "lucide-react";
 
 /* =========================================================================
@@ -214,38 +214,66 @@ const SEED_USERS = [
   { cpf: "222.222.222-22", nome: "Jonas Amorim", email: "jonas@exemplo.com", telefone: "(83) 99222-2222", perfil: "administrador", senha: "1234" },
 ];
 
-const SEED_LIVROS = [
-  { id: "L1", tombo: "T-0001", isbn: "978-85-3263-4214", titulo: "10 lições sobre Kant", autor: "Flamarion Tavares Leite", ano: "2012", edicao: "1ª", editora: "Zahar", local: "Estante A1", paginas: "120", generos: ["Filosofia"], conservacao: "Regular", foto: null, nota: 0, comentario: "", historico: [], status: "Disponível" },
-  { id: "L2", tombo: "T-0002", isbn: "978-85-7860-9313", titulo: "12 Homens Extraordinariamente Comuns", autor: "John MacArthur", ano: "2003", edicao: "2ª", editora: "Vida", local: "Estante B2", paginas: "220", generos: ["Teologia"], conservacao: "Bom", foto: null, nota: 0, comentario: "", historico: [], status: "Disponível" },
-  { id: "L3", tombo: "T-0003", isbn: "978-85-5080-2756", titulo: "12 Regras para a Vida", autor: "Jordan B. Peterson", ano: "2018", edicao: "1ª", editora: "Alta Cult", local: "Estante A3", paginas: "412", generos: ["Autoajuda"], conservacao: "Bom", foto: null, nota: 0, comentario: "", historico: [], status: "Disponível" },
-  { id: "L4", tombo: "T-0004", isbn: "978-85-6247-8697", titulo: "A Busca da Santidade", autor: "Jerry Bridges", ano: "1999", edicao: "3ª", editora: "Fiel", local: "Estante B1", paginas: "210", generos: ["Teologia"], conservacao: "Regular", foto: null, nota: 4, comentario: "Leitura densa, mas muito proveitosa.", historico: [], status: "Disponível" },
-  { id: "L5", tombo: "T-0005", isbn: "978-65-8621-7346", titulo: "A Crise da Cultura e a Ordem do Amor", autor: "Victor Sales Pinheiro", ano: "2021", edicao: "1ª", editora: "VIDE", local: "Estante C1", paginas: "180", generos: ["Filosofia", "Teologia"], conservacao: "Bom", foto: null, nota: 5, comentario: "", historico: [], status: "Emprestado" },
-  { id: "L6", tombo: "T-0006", isbn: "978-85-1234-0001", titulo: "Ego Transformado", autor: "T. Keller", ano: "2015", edicao: "1ª", editora: "Vida Nova", local: "Estante B3", paginas: "160", generos: ["Teologia"], conservacao: "Bom", foto: null, nota: 0, comentario: "", historico: [], status: "Emprestado" },
-  { id: "L7", tombo: "T-0007", isbn: "978-85-1234-0002", titulo: "O Drama das Escrituras", autor: "C. Bartholomew", ano: "2014", edicao: "1ª", editora: "Vida Nova", local: "Estante B4", paginas: "320", generos: ["Teologia"], conservacao: "Regular", foto: null, nota: 0, comentario: "", historico: [], status: "Emprestado" },
-  { id: "L8", tombo: "T-0008", isbn: "978-85-1234-0003", titulo: "Deuses Falsos", autor: "T. Keller", ano: "2013", edicao: "2ª", editora: "Vida Nova", local: "Estante B5", paginas: "240", generos: ["Teologia"], conservacao: "Bom", foto: null, nota: 3, comentario: "Reler trechos sobre dinheiro.", historico: [], status: "Emprestado" },
-  { id: "L9", tombo: "T-0009", isbn: "978-85-1234-0004", titulo: "O Homem Mais Rico da Babilônia", autor: "George S. Clason", ano: "1926", edicao: "5ª", editora: "Harper Collins", local: "Estante D1", paginas: "144", generos: ["Finanças"], conservacao: "Bom", foto: null, nota: 0, comentario: "", historico: [], status: "Disponível" },
+const SEED_TITULOS = [
+  { id: "L1", isbn: "978-85-3263-4214", titulo: "10 lições sobre Kant", autor: "Flamarion Tavares Leite", ano: "2012", edicao: "1ª", editora: "Zahar", local: "Estante A1", paginas: "120", generos: ["Filosofia"], foto: null, nota: 0, comentario: "" },
+  { id: "L2", isbn: "978-85-7860-9313", titulo: "12 Homens Extraordinariamente Comuns", autor: "John MacArthur", ano: "2003", edicao: "2ª", editora: "Vida", local: "Estante B2", paginas: "220", generos: ["Teologia"], foto: null, nota: 0, comentario: "" },
+  { id: "L3", isbn: "978-85-5080-2756", titulo: "12 Regras para a Vida", autor: "Jordan B. Peterson", ano: "2018", edicao: "1ª", editora: "Alta Cult", local: "Estante A3", paginas: "412", generos: ["Autoajuda"], foto: null, nota: 0, comentario: "" },
+  { id: "L4", isbn: "978-85-6247-8697", titulo: "A Busca da Santidade", autor: "Jerry Bridges", ano: "1999", edicao: "3ª", editora: "Fiel", local: "Estante B1", paginas: "210", generos: ["Teologia"], foto: null, nota: 4, comentario: "Leitura densa, mas muito proveitosa." },
+  { id: "L5", isbn: "978-65-8621-7346", titulo: "A Crise da Cultura e a Ordem do Amor", autor: "Victor Sales Pinheiro", ano: "2021", edicao: "1ª", editora: "VIDE", local: "Estante C1", paginas: "180", generos: ["Filosofia", "Teologia"], foto: null, nota: 5, comentario: "" },
+  { id: "L6", isbn: "978-85-1234-0001", titulo: "Ego Transformado", autor: "T. Keller", ano: "2015", edicao: "1ª", editora: "Vida Nova", local: "Estante B3", paginas: "160", generos: ["Teologia"], foto: null, nota: 0, comentario: "" },
+  { id: "L7", isbn: "978-85-1234-0002", titulo: "O Drama das Escrituras", autor: "C. Bartholomew", ano: "2014", edicao: "1ª", editora: "Vida Nova", local: "Estante B4", paginas: "320", generos: ["Teologia"], foto: null, nota: 0, comentario: "" },
+  { id: "L8", isbn: "978-85-1234-0003", titulo: "Deuses Falsos", autor: "T. Keller", ano: "2013", edicao: "2ª", editora: "Vida Nova", local: "Estante B5", paginas: "240", generos: ["Teologia"], foto: null, nota: 3, comentario: "Reler trechos sobre dinheiro." },
+  { id: "L9", isbn: "978-85-1234-0004", titulo: "O Homem Mais Rico da Babilônia", autor: "George S. Clason", ano: "1926", edicao: "5ª", editora: "Harper Collins", local: "Estante D1", paginas: "144", generos: ["Finanças"], foto: null, nota: 0, comentario: "" },
+];
+
+const SEED_EXEMPLARES = [
+  { id: "EX1", tituloId: "L1", tombo: "T-0001", estadoConservacao: "Regular", status: "Disponível", emprestimoAtualId: null, motivoIndisponivel: null, historico: [] },
+  { id: "EX2", tituloId: "L2", tombo: "T-0002", estadoConservacao: "Bom",     status: "Disponível", emprestimoAtualId: null, motivoIndisponivel: null, historico: [] },
+  { id: "EX3", tituloId: "L3", tombo: "T-0003", estadoConservacao: "Bom",     status: "Disponível", emprestimoAtualId: null, motivoIndisponivel: null, historico: [] },
+  { id: "EX4", tituloId: "L4", tombo: "T-0004", estadoConservacao: "Regular", status: "Disponível", emprestimoAtualId: null, motivoIndisponivel: null, historico: [] },
+  { id: "EX5", tituloId: "L5", tombo: "T-0005", estadoConservacao: "Bom",     status: "Disponível", emprestimoAtualId: null, motivoIndisponivel: null, historico: [] },
+  { id: "EX6", tituloId: "L6", tombo: "T-0006", estadoConservacao: "Bom",     status: "Emprestado", emprestimoAtualId: "E1",  motivoIndisponivel: null, historico: [] },
+  { id: "EX7", tituloId: "L7", tombo: "T-0007", estadoConservacao: "Regular", status: "Emprestado", emprestimoAtualId: "E2",  motivoIndisponivel: null, historico: [] },
+  { id: "EX8", tituloId: "L8", tombo: "T-0008", estadoConservacao: "Bom",     status: "Emprestado", emprestimoAtualId: "E3",  motivoIndisponivel: null, historico: [] },
+  { id: "EX9", tituloId: "L9", tombo: "T-0009", estadoConservacao: "Bom",     status: "Disponível", emprestimoAtualId: null, motivoIndisponivel: null, historico: [] },
 ];
 
 const SEED_EMPRESTIMOS = [
-  { id: "E1", livroId: "L6", locatario: "Veruska FB", dataEmprestimo: addDays(todayISO(), -32), dataDevolucao: addDays(todayISO(), 1), status: "Ativo", observacoes: "Indicação", renovacao: null },
-  { id: "E2", livroId: "L7", locatario: "Jonas Amorim", dataEmprestimo: addDays(todayISO(), -45), dataDevolucao: addDays(todayISO(), -29), status: "Atrasado", observacoes: "Pág 26, 56 a 64 riscos do dono", renovacao: null },
-  { id: "E3", livroId: "L8", locatario: "Vanessa", dataEmprestimo: addDays(todayISO(), -45), dataDevolucao: addDays(todayISO(), -29), status: "Atrasado", observacoes: "Discipulado", renovacao: null },
-  { id: "E4",  livroId: "L9",  locatario: "Jonas",         dataEmprestimo: addDays(todayISO(), -60),  dataDevolucao: addDays(todayISO(), -46),  dataDevolucaoEfetiva: addDays(todayISO(), -48),  status: "Devolvido", observacoes: "Discipulado", renovacao: null },
-  { id: "H1",  livroId: "L3",  locatario: "Veruska FB",    dataEmprestimo: addDays(todayISO(), -88),  dataDevolucao: addDays(todayISO(), -74),  dataDevolucaoEfetiva: addDays(todayISO(), -75),  status: "Devolvido", observacoes: "", renovacao: null },
-  { id: "H2",  livroId: "L1",  locatario: "Jonas Amorim",  dataEmprestimo: addDays(todayISO(), -80),  dataDevolucao: addDays(todayISO(), -66),  dataDevolucaoEfetiva: addDays(todayISO(), -60),  status: "Devolvido", observacoes: "", renovacao: null },
-  { id: "H3",  livroId: "L4",  locatario: "Vanessa",       dataEmprestimo: addDays(todayISO(), -75),  dataDevolucao: addDays(todayISO(), -61),  dataDevolucaoEfetiva: addDays(todayISO(), -62),  status: "Devolvido", observacoes: "", renovacao: null },
-  { id: "H4",  livroId: "L2",  locatario: "Veruska FB",    dataEmprestimo: addDays(todayISO(), -70),  dataDevolucao: addDays(todayISO(), -56),  dataDevolucaoEfetiva: addDays(todayISO(), -50),  status: "Devolvido", observacoes: "", renovacao: null },
-  { id: "H5",  livroId: "L5",  locatario: "Marcos Lima",   dataEmprestimo: addDays(todayISO(), -65),  dataDevolucao: addDays(todayISO(), -51),  dataDevolucaoEfetiva: addDays(todayISO(), -52),  status: "Devolvido", observacoes: "", renovacao: null },
-  { id: "H6",  livroId: "L6",  locatario: "Jonas Amorim",  dataEmprestimo: addDays(todayISO(), -55),  dataDevolucao: addDays(todayISO(), -41),  dataDevolucaoEfetiva: addDays(todayISO(), -38),  status: "Devolvido", observacoes: "", renovacao: null },
-  { id: "H7",  livroId: "L7",  locatario: "Vanessa",       dataEmprestimo: addDays(todayISO(), -50),  dataDevolucao: addDays(todayISO(), -36),  dataDevolucaoEfetiva: addDays(todayISO(), -36),  status: "Devolvido", observacoes: "", renovacao: null },
-  { id: "H8",  livroId: "L1",  locatario: "Marcos Lima",   dataEmprestimo: addDays(todayISO(), -42),  dataDevolucao: addDays(todayISO(), -28),  dataDevolucaoEfetiva: addDays(todayISO(), -20),  status: "Devolvido", observacoes: "", renovacao: null },
-  { id: "H9",  livroId: "L3",  locatario: "Jonas",         dataEmprestimo: addDays(todayISO(), -35),  dataDevolucao: addDays(todayISO(), -21),  dataDevolucaoEfetiva: addDays(todayISO(), -22),  status: "Devolvido", observacoes: "", renovacao: null },
-  { id: "H10", livroId: "L8",  locatario: "Veruska FB",    dataEmprestimo: addDays(todayISO(), -28),  dataDevolucao: addDays(todayISO(), -14),  dataDevolucaoEfetiva: addDays(todayISO(), -10),  status: "Devolvido", observacoes: "", renovacao: null },
+  { id: "E1",  exemplarId: "EX6", locatario: "Veruska FB",   locatarioCpf: "11111111111", dataEmprestimo: addDays(todayISO(), -32), dataDevolucao: addDays(todayISO(), 1),   status: "Ativo",     observacoes: "Indicação",              renovacao: null },
+  { id: "E2",  exemplarId: "EX7", locatario: "Jonas Amorim", locatarioCpf: "22222222222", dataEmprestimo: addDays(todayISO(), -45), dataDevolucao: addDays(todayISO(), -29), status: "Atrasado",  observacoes: "Pág 26, 56 a 64 riscos do dono", renovacao: null },
+  { id: "E3",  exemplarId: "EX8", locatario: "Vanessa",      locatarioCpf: null,          dataEmprestimo: addDays(todayISO(), -45), dataDevolucao: addDays(todayISO(), -29), status: "Atrasado",  observacoes: "Discipulado",            renovacao: null },
+  { id: "E4",  exemplarId: "EX9", locatario: "Jonas",        locatarioCpf: null,          dataEmprestimo: addDays(todayISO(), -60), dataDevolucao: addDays(todayISO(), -46), dataDevolucaoEfetiva: addDays(todayISO(), -48), status: "Devolvido", observacoes: "Discipulado", renovacao: null },
+  { id: "H1",  exemplarId: "EX3", locatario: "Veruska FB",   locatarioCpf: "11111111111", dataEmprestimo: addDays(todayISO(), -88), dataDevolucao: addDays(todayISO(), -74), dataDevolucaoEfetiva: addDays(todayISO(), -75), status: "Devolvido", observacoes: "", renovacao: null },
+  { id: "H2",  exemplarId: "EX1", locatario: "Jonas Amorim", locatarioCpf: "22222222222", dataEmprestimo: addDays(todayISO(), -80), dataDevolucao: addDays(todayISO(), -66), dataDevolucaoEfetiva: addDays(todayISO(), -60), status: "Devolvido", observacoes: "", renovacao: null },
+  { id: "H3",  exemplarId: "EX4", locatario: "Vanessa",      locatarioCpf: null,          dataEmprestimo: addDays(todayISO(), -75), dataDevolucao: addDays(todayISO(), -61), dataDevolucaoEfetiva: addDays(todayISO(), -62), status: "Devolvido", observacoes: "", renovacao: null },
+  { id: "H4",  exemplarId: "EX2", locatario: "Veruska FB",   locatarioCpf: "11111111111", dataEmprestimo: addDays(todayISO(), -70), dataDevolucao: addDays(todayISO(), -56), dataDevolucaoEfetiva: addDays(todayISO(), -50), status: "Devolvido", observacoes: "", renovacao: null },
+  { id: "H5",  exemplarId: "EX5", locatario: "Marcos Lima",  locatarioCpf: null,          dataEmprestimo: addDays(todayISO(), -65), dataDevolucao: addDays(todayISO(), -51), dataDevolucaoEfetiva: addDays(todayISO(), -52), status: "Devolvido", observacoes: "", renovacao: null },
+  { id: "H6",  exemplarId: "EX6", locatario: "Jonas Amorim", locatarioCpf: "22222222222", dataEmprestimo: addDays(todayISO(), -55), dataDevolucao: addDays(todayISO(), -41), dataDevolucaoEfetiva: addDays(todayISO(), -38), status: "Devolvido", observacoes: "", renovacao: null },
+  { id: "H7",  exemplarId: "EX7", locatario: "Vanessa",      locatarioCpf: null,          dataEmprestimo: addDays(todayISO(), -50), dataDevolucao: addDays(todayISO(), -36), dataDevolucaoEfetiva: addDays(todayISO(), -36), status: "Devolvido", observacoes: "", renovacao: null },
+  { id: "H8",  exemplarId: "EX1", locatario: "Marcos Lima",  locatarioCpf: null,          dataEmprestimo: addDays(todayISO(), -42), dataDevolucao: addDays(todayISO(), -28), dataDevolucaoEfetiva: addDays(todayISO(), -20), status: "Devolvido", observacoes: "", renovacao: null },
+  { id: "H9",  exemplarId: "EX3", locatario: "Jonas",        locatarioCpf: null,          dataEmprestimo: addDays(todayISO(), -35), dataDevolucao: addDays(todayISO(), -21), dataDevolucaoEfetiva: addDays(todayISO(), -22), status: "Devolvido", observacoes: "", renovacao: null },
+  { id: "H10", exemplarId: "EX8", locatario: "Veruska FB",   locatarioCpf: "11111111111", dataEmprestimo: addDays(todayISO(), -28), dataDevolucao: addDays(todayISO(), -14), dataDevolucaoEfetiva: addDays(todayISO(), -10), status: "Devolvido", observacoes: "", renovacao: null },
 ];
 
 const SEED_ANOTACOES = [
   { id: "A1", livroId: "L8", titulo: "Deuses falsos", nota: 3, texto: "Pág 35,36 e 44 riscadas pelo dono", data: new Date(Date.now() - 86400000 * 3).toISOString() },
 ];
+
+/* helpers de disponibilidade */
+function getDisponibilidadeTitulo(tituloId, exemplares) {
+  return exemplares.filter((e) => e.tituloId === tituloId && e.status === "Disponível").length;
+}
+function getStatusTitulo(tituloId, exemplares) {
+  const exs = exemplares.filter((e) => e.tituloId === tituloId);
+  if (!exs.length) return "Sem exemplares";
+  if (exs.some((e) => e.status === "Disponível")) return "Disponível";
+  if (exs.some((e) => e.status === "Emprestado")) return "Emprestado";
+  return "Indisponível";
+}
+function getTituloFromEmprestimo(emp, exemplares, titulos) {
+  const ex = exemplares.find((x) => x.id === emp.exemplarId);
+  return titulos.find((t) => t.id === ex?.tituloId) || null;
+}
 
 const SEED_CONFIG_NOTIF = [
   { id: "reserva", nome: "Reserva confirmada", destinatario: "Locatário", horario: "09:00", gatilho: "No registro do empréstimo", texto: "Olá {nome_locatario}! Reservamos o livro \"{nome_livro}\" para você. Devolução prevista: {data_devolucao}." },
@@ -432,7 +460,7 @@ class ErrorBoundary extends React.Component {
             <p style={{ fontSize: 13, color: COLORS.ink }}>{String(this.state.error?.message || this.state.error)}</p>
             <button
               onClick={async () => {
-                const keys = ["usuarios", "livros", "emprestimos", "leituras", "anotacoes", "notifLog", "configNotif", "renovacoes", "posts", "grupos", "auth"];
+                const keys = ["usuarios", "titulos", "exemplares", "emprestimos", "solicitacoes", "listaEspera", "leituras", "anotacoes", "notifLog", "configNotif", "renovacoes", "posts", "grupos", "sugestoes", "auth"];
                 for (const k of keys) { try { await deleteKey(k); } catch {} }
                 await deleteKeysByPrefix("desejos:");
                 window.location.reload();
@@ -462,13 +490,17 @@ function AppInner() {
   const [booted, setBooted] = useState(false);
   const [auth, setAuth] = useState(null); // {cpf, nome, perfil}
   const [usuarios, setUsuarios] = useState(SEED_USERS);
-  const [livros, setLivros] = useState(SEED_LIVROS);
+  const [titulos, setTitulos] = useState(SEED_TITULOS);
+  const [exemplares, setExemplares] = useState(SEED_EXEMPLARES);
   const [emprestimos, setEmprestimos] = useState(SEED_EMPRESTIMOS);
+  const [solicitacoes, setSolicitacoes] = useState([]);
+  const [listaEspera, setListaEspera] = useState([]);
   const [leituras, setLeituras] = useState([]);
   const [anotacoes, setAnotacoes] = useState(SEED_ANOTACOES);
   const [notifLog, setNotifLog] = useState([]);
   const [configNotif, setConfigNotif] = useState(SEED_CONFIG_NOTIF);
   const [renovacoes, setRenovacoes] = useState([]);
+  const [sugestoes, setSugestoes] = useState([]);
   const [posts, setPosts] = useState([
     { id: "P1", autor: "Jonas Amorim", texto: "Terminei \"Deuses Falsos\" essa semana — recomendo demais para quem quer entender ídolos modernos.", data: new Date(Date.now() - 86400000).toISOString(), likes: ["Veruska FB"], comentarios: [{ autor: "Veruska FB", texto: "Já está na minha fila!", data: new Date(Date.now() - 80000000).toISOString() }] },
   ]);
@@ -483,10 +515,13 @@ function AppInner() {
   // Load persisted state once
   useEffect(() => {
     (async () => {
-      const [u, l, e, le, an, nl, cn, rv, ps, gp, a] = await Promise.all([
+      const [u, tit, exs, e, sol, le2, le, an, nl, cn, rv, ps, gp, sug, a] = await Promise.all([
         loadKey("usuarios", null),
-        loadKey("livros", null),
+        loadKey("titulos", null),
+        loadKey("exemplares", null),
         loadKey("emprestimos", null),
+        loadKey("solicitacoes", null),
+        loadKey("listaEspera", null),
         loadKey("leituras", null),
         loadKey("anotacoes", null),
         loadKey("notifLog", null),
@@ -494,11 +529,15 @@ function AppInner() {
         loadKey("renovacoes", null),
         loadKey("posts", null),
         loadKey("grupos", null),
+        loadKey("sugestoes", null),
         loadKey("auth", null),
       ]);
       if (u && Array.isArray(u) && u.length > 0 && u[0]?.cpf) setUsuarios(u);
-      if (l) setLivros(l);
+      if (tit) setTitulos(tit);
+      if (exs) setExemplares(exs);
       if (e) setEmprestimos(e);
+      if (sol) setSolicitacoes(sol);
+      if (le2) setListaEspera(le2);
       if (le) setLeituras(le);
       if (an) setAnotacoes(an);
       if (nl) setNotifLog(nl);
@@ -506,6 +545,7 @@ function AppInner() {
       if (rv) setRenovacoes(rv);
       if (ps) setPosts(ps);
       if (gp) setGrupos(gp);
+      if (sug) setSugestoes(sug);
       if (a && a.cpf && a.perfil && a.nome) setAuth(a);
       setBooted(true);
     })();
@@ -513,8 +553,11 @@ function AppInner() {
 
   // Persist on change (after initial boot)
   useEffect(() => { if (booted) saveKey("usuarios", usuarios); }, [usuarios, booted]);
-  useEffect(() => { if (booted) saveKey("livros", livros); }, [livros, booted]);
+  useEffect(() => { if (booted) saveKey("titulos", titulos); }, [titulos, booted]);
+  useEffect(() => { if (booted) saveKey("exemplares", exemplares); }, [exemplares, booted]);
   useEffect(() => { if (booted) saveKey("emprestimos", emprestimos); }, [emprestimos, booted]);
+  useEffect(() => { if (booted) saveKey("solicitacoes", solicitacoes); }, [solicitacoes, booted]);
+  useEffect(() => { if (booted) saveKey("listaEspera", listaEspera); }, [listaEspera, booted]);
   useEffect(() => { if (booted) saveKey("leituras", leituras); }, [leituras, booted]);
   useEffect(() => { if (booted) saveKey("anotacoes", anotacoes); }, [anotacoes, booted]);
   useEffect(() => { if (booted) saveKey("notifLog", notifLog); }, [notifLog, booted]);
@@ -522,6 +565,7 @@ function AppInner() {
   useEffect(() => { if (booted) saveKey("renovacoes", renovacoes); }, [renovacoes, booted]);
   useEffect(() => { if (booted) saveKey("posts", posts); }, [posts, booted]);
   useEffect(() => { if (booted) saveKey("grupos", grupos); }, [grupos, booted]);
+  useEffect(() => { if (booted) saveKey("sugestoes", sugestoes); }, [sugestoes, booted]);
   useEffect(() => { if (booted) saveKey("auth", auth); }, [auth, booted]);
 
   useEffect(() => {
@@ -627,8 +671,11 @@ function AppInner() {
   const ctx = {
     auth, usuarios, setUsuarios,
     setAuth,
-    livros, setLivros,
+    titulos, setTitulos,
+    exemplares, setExemplares,
     emprestimos, setEmprestimos,
+    solicitacoes, setSolicitacoes,
+    listaEspera, setListaEspera,
     leituras, setLeituras,
     anotacoes, setAnotacoes,
     notifLog, sendNotif,
@@ -636,6 +683,7 @@ function AppInner() {
     renovacoes, setRenovacoes,
     posts, setPosts,
     grupos, setGrupos,
+    sugestoes, setSugestoes,
     desejos, addDesejo, removeDesejo,
     routeParams,
     showToast,
@@ -1141,7 +1189,7 @@ function LoginScreen({ usuarios, setUsuarios, onLogin, sendNotif, showToast }) {
                 type="button"
                 onClick={async () => {
                   if (!window.confirm("Isso vai apagar todos os dados salvos neste protótipo (livros, empréstimos, usuários, etc.) e restaurar os dados de demonstração originais. Continuar?")) return;
-                  const keys = ["usuarios", "livros", "emprestimos", "leituras", "anotacoes", "notifLog", "configNotif", "renovacoes", "posts", "grupos", "auth"];
+                  const keys = ["usuarios", "titulos", "exemplares", "emprestimos", "solicitacoes", "listaEspera", "leituras", "anotacoes", "notifLog", "configNotif", "renovacoes", "posts", "grupos", "sugestoes", "auth"];
                   for (const k of keys) { try { await deleteKey(k); } catch {} }
                   await deleteKeysByPrefix("desejos:");
                   window.location.reload();
@@ -1194,20 +1242,20 @@ function LoginScreen({ usuarios, setUsuarios, onLogin, sendNotif, showToast }) {
    SCREEN: PAINEL
    ========================================================================= */
 function PainelScreen({ ctx, setRoute }) {
-  const { livros, emprestimos, usuarios, renovacoes, leituras } = ctx;
+  const { titulos, exemplares, emprestimos, usuarios, renovacoes, leituras } = ctx;
   const isAdmin = ctx.auth.perfil === "administrador";
   const today = todayISO();
 
   // admin — atenção
   const atrasadosList = emprestimos
     .filter((e) => e.status === "Atrasado")
-    .map((e) => ({ ...e, livro: livros.find((l) => l.id === e.livroId), dias: diffDays(e.dataDevolucao, today) }))
+    .map((e) => ({ ...e, livro: getTituloFromEmprestimo(e, exemplares, titulos), dias: diffDays(e.dataDevolucao, today) }))
     .sort((a, b) => b.dias - a.dias);
   const renovPendentes = (renovacoes || []).filter((r) => r.status === "Solicitada");
   const semAcaoPendente = atrasadosList.length === 0 && renovPendentes.length === 0;
 
   // admin — visão geral
-  const total = livros.length;
+  const total = titulos.length;
   const ativos = emprestimos.filter((e) => e.status === "Ativo" || e.status === "Atrasado").length;
   const emDiaPct = ativos === 0 ? 100 : Math.round(((ativos - atrasadosList.length) / ativos) * 100);
   const novosUltimos7 = emprestimos.filter((e) => e.dataEmprestimo >= addDays(today, -7)).length;
@@ -1221,8 +1269,12 @@ function PainelScreen({ ctx, setRoute }) {
   const totalUsuarios = usuarios.length;
   const totalLeitores = usuarios.filter((u) => u.perfil === "leitor").length;
   const rankingLivros = Object.entries(
-    emprestimos.reduce((acc, e) => { acc[e.livroId] = (acc[e.livroId] || 0) + 1; return acc; }, {})
-  ).map(([livroId, count]) => ({ livro: livros.find((l) => l.id === livroId), count }))
+    emprestimos.reduce((acc, e) => {
+      const ex = exemplares.find((x) => x.id === e.exemplarId);
+      if (ex) acc[ex.tituloId] = (acc[ex.tituloId] || 0) + 1;
+      return acc;
+    }, {})
+  ).map(([tituloId, count]) => ({ livro: titulos.find((t) => t.id === tituloId), count }))
     .sort((a, b) => b.count - a.count).slice(0, 10);
   const rankingLeitores = Object.entries(
     emprestimos.reduce((acc, e) => { acc[e.locatario] = (acc[e.locatario] || 0) + 1; return acc; }, {})
@@ -1232,15 +1284,19 @@ function PainelScreen({ ctx, setRoute }) {
   // leitor — meus empréstimos
   const primeiroNome = ctx.auth.nome.split(" ")[0].toLowerCase();
   const meusEmprestimos = emprestimos
-    .filter((e) => e.status !== "Devolvido" && e.locatario.toLowerCase().includes(primeiroNome))
-    .map((e) => ({ ...e, livro: livros.find((l) => l.id === e.livroId), dias: diffDays(today, e.dataDevolucao) }))
+    .filter((e) => {
+      if (e.status === "Devolvido") return false;
+      if (e.locatarioCpf) return e.locatarioCpf === ctx.auth.cpf;
+      return e.locatario.toLowerCase().includes(primeiroNome);
+    })
+    .map((e) => ({ ...e, livro: getTituloFromEmprestimo(e, exemplares, titulos), dias: diffDays(today, e.dataDevolucao) }))
     .sort((a, b) => a.dias - b.dias);
   const proximo = meusEmprestimos[0];
   const minhasRenovPendentes = (renovacoes || []).filter(
     (r) => r.status === "Solicitada" && r.locatario.toLowerCase().includes(primeiroNome)
   );
   const emLeitura = (leituras || []).find((l) => l.progresso > 0 && l.progresso < 100);
-  const livroEmLeitura = emLeitura ? livros.find((l) => l.id === emLeitura.livroId) : null;
+  const livroEmLeitura = emLeitura ? titulos.find((t) => t.id === emLeitura.livroId) : null;
 
   // render admin
   if (isAdmin) return (
@@ -1271,7 +1327,8 @@ function PainelScreen({ ctx, setRoute }) {
             </div>
           ))}
           {renovPendentes.map((r, i) => {
-            const livro = livros.find((l) => l.id === r.livroId);
+            const empRenov = emprestimos.find((e) => e.id === r.emprestimoId);
+            const tituloRenov = empRenov ? getTituloFromEmprestimo(empRenov, exemplares, titulos) : null;
             return (
               <div key={r.id} style={{
                 display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10,
@@ -1280,7 +1337,7 @@ function PainelScreen({ ctx, setRoute }) {
               }}>
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontSize: 13, color: COLORS.ink, fontWeight: 500 }}>{r.locatario}</div>
-                  <div style={{ fontSize: 12, color: COLORS.neutral, marginTop: 1 }}>pediu renovação de "{livro?.titulo}"</div>
+                  <div style={{ fontSize: 12, color: COLORS.neutral, marginTop: 1 }}>pediu renovação de "{tituloRenov?.titulo}"</div>
                 </div>
                 <Btn variant="ghost" style={{ flexShrink: 0, padding: "6px 12px", fontSize: 12 }} onClick={() => setRoute("renovacoes")}>Avaliar</Btn>
               </div>
@@ -1441,21 +1498,21 @@ function PageTitle({ title, subtitle, action }) {
 }
 
 /* =========================================================================
-   SCREEN: LIVROS
+   SCREEN: LIVROS (Título/Exemplar model)
    ========================================================================= */
 const ESTADOS_CONSERVACAO = ["Ótimo", "Bom", "Regular", "Ruim"];
 
 function LivrosScreen({ ctx }) {
-  const { livros, setLivros, emprestimos, showToast, routeParams } = ctx;
-  const isAdmin = true;
+  const { titulos, setTitulos, exemplares, setExemplares, emprestimos, showToast, auth, routeParams } = ctx;
+  const isAdmin = auth.perfil === "administrador";
   const [query, setQuery] = useState("");
   const [catFilter, setCatFilter] = useState("");
   const [availFilter, setAvailFilter] = useState("Todos");
   const [viewMode, setViewMode] = useState("grade");
-  const [formOpen, setFormOpen] = useState(false);
-  const [editing, setEditing] = useState(null);
+  const [formTitulo, setFormTitulo] = useState(null); // null=fechado, {}=novo, {id,...}=editar
+  const [formExemplar, setFormExemplar] = useState(null); // {tituloId} ou {id,...}
   const [detailId, setDetailId] = useState(null);
-  const [toDelete, setToDelete] = useState(null);
+  const [toDelete, setToDelete] = useState(null); // { tipo: "titulo"|"exemplar", item }
 
   useEffect(() => {
     if (routeParams?.livroId) setDetailId(routeParams.livroId);
@@ -1465,73 +1522,77 @@ function LivrosScreen({ ctx }) {
     loadKey("catalogo:visualizacao", "grade").then(setViewMode);
   }, []);
 
-  function setView(mode) {
-    setViewMode(mode);
-    saveKey("catalogo:visualizacao", mode);
-  }
+  function setView(mode) { setViewMode(mode); saveKey("catalogo:visualizacao", mode); }
+  function norm(s) { return (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
 
-  function norm(s) {
-    return (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
-  }
+  const allCats = [...new Set(titulos.flatMap((t) => t.generos))].sort();
 
-  const allCats = [...new Set(livros.flatMap((l) => l.generos))].sort();
-
-  const filtered = livros.filter((l) => {
+  const filtered = titulos.filter((t) => {
     const q = norm(query);
-    if (q && !norm(l.titulo).includes(q) && !norm(l.autor).includes(q) && !l.isbn.includes(q) && !l.tombo.toLowerCase().includes(q)) return false;
-    if (catFilter && !l.generos.includes(catFilter)) return false;
-    if (availFilter !== "Todos" && l.status !== availFilter) return false;
+    if (q && !norm(t.titulo).includes(q) && !norm(t.autor).includes(q) && !t.isbn.includes(q)) return false;
+    if (catFilter && !t.generos.includes(catFilter)) return false;
+    if (availFilter !== "Todos") {
+      const st = getStatusTitulo(t.id, exemplares);
+      if (st !== availFilter) return false;
+    }
     return true;
   });
 
   const hasActiveFilter = !!(query || catFilter || availFilter !== "Todos");
+  function clearFilters() { setQuery(""); setCatFilter(""); setAvailFilter("Todos"); }
 
-  function clearFilters() {
-    setQuery("");
-    setCatFilter("");
-    setAvailFilter("Todos");
-  }
-
-  function saveLivro(data) {
-    if (editing) {
-      setLivros((prev) => prev.map((l) => (l.id === editing.id ? {
-        ...l, ...data,
-        historico: [{ campo: "Cadastro", de: "—", para: "Atualizado", usuario: ctx.auth.nome, data: new Date().toISOString() }, ...l.historico],
-      } : l)));
-      showToast("Livro atualizado.");
+  function saveTitulo(data) {
+    if (formTitulo?.id) {
+      setTitulos((prev) => prev.map((t) => t.id === formTitulo.id ? { ...t, ...data } : t));
+      showToast("Título atualizado.");
     } else {
-      setLivros((prev) => [...prev, { ...data, id: uid("L"), status: "Disponível", nota: 0, comentario: "", historico: [{ campo: "Cadastro", de: "—", para: "Criado", usuario: ctx.auth.nome, data: new Date().toISOString() }] }]);
-      showToast("Livro cadastrado.");
+      const novoId = uid("L");
+      setTitulos((prev) => [...prev, { ...data, id: novoId, nota: 0, comentario: "" }]);
+      showToast("Título cadastrado.");
     }
-    setFormOpen(false);
-    setEditing(null);
+    setFormTitulo(null);
   }
 
-  function duplicar(l) {
-    setLivros((prev) => [...prev, { ...l, id: uid("L"), titulo: l.titulo + " (cópia)", status: "Disponível", historico: [] }]);
-    showToast("Livro duplicado.");
+  function saveExemplar(data) {
+    if (formExemplar?.id) {
+      setExemplares((prev) => prev.map((ex) => ex.id === formExemplar.id ? { ...ex, ...data } : ex));
+      showToast("Exemplar atualizado.");
+    } else {
+      setExemplares((prev) => [...prev, { ...data, id: uid("EX"), status: "Disponível", emprestimoAtualId: null, motivoIndisponivel: null, historico: [] }]);
+      showToast("Exemplar cadastrado.");
+    }
+    setFormExemplar(null);
   }
 
-  function excluir(l) {
-    const temAtivo = emprestimos.some((e) => e.livroId === l.id && (e.status === "Ativo" || e.status === "Atrasado"));
-    if (temAtivo) {
-      showToast("Não é possível excluir: há empréstimo ativo para este livro.");
-      setToDelete(null);
-      return;
-    }
-    setLivros((prev) => prev.filter((x) => x.id !== l.id));
+  function excluirTitulo(t) {
+    const exsDoTitulo = exemplares.filter((ex) => ex.tituloId === t.id);
+    const temAtivo = exsDoTitulo.some((ex) => emprestimos.some((e) => e.exemplarId === ex.id && (e.status === "Ativo" || e.status === "Atrasado")));
+    if (temAtivo) { showToast("Não é possível excluir: há empréstimo ativo."); setToDelete(null); return; }
+    setExemplares((prev) => prev.filter((ex) => ex.tituloId !== t.id));
+    setTitulos((prev) => prev.filter((x) => x.id !== t.id));
     setToDelete(null);
-    showToast("Livro excluído.");
+    showToast("Título e exemplares excluídos.");
   }
 
-  const detailBook = detailId ? livros.find((l) => l.id === detailId) : null;
-  if (detailBook) {
+  function excluirExemplar(ex) {
+    const temAtivo = emprestimos.some((e) => e.exemplarId === ex.id && (e.status === "Ativo" || e.status === "Atrasado"));
+    if (temAtivo) { showToast("Não é possível excluir: há empréstimo ativo."); setToDelete(null); return; }
+    setExemplares((prev) => prev.filter((x) => x.id !== ex.id));
+    setToDelete(null);
+    showToast("Exemplar excluído.");
+  }
+
+  const detailTitulo = detailId ? titulos.find((t) => t.id === detailId) : null;
+  if (detailTitulo) {
     return (
-      <LivroDetalhe
-        livro={detailBook}
+      <TituloDetalhe
+        titulo={detailTitulo}
         ctx={ctx}
         onBack={() => setDetailId(null)}
-        onEdit={() => { setDetailId(null); setEditing(detailBook); setFormOpen(true); }}
+        onEditTitulo={() => { setDetailId(null); setFormTitulo(detailTitulo); }}
+        onAddExemplar={() => setFormExemplar({ tituloId: detailTitulo.id })}
+        onEditExemplar={(ex) => setFormExemplar(ex)}
+        onDeleteExemplar={(ex) => setToDelete({ tipo: "exemplar", item: ex })}
       />
     );
   }
@@ -1540,121 +1601,76 @@ function LivrosScreen({ ctx }) {
     <div>
       <PageTitle
         title="Catálogo"
-        subtitle={`${livros.length} exemplares no acervo`}
+        subtitle={`${titulos.length} título(s) · ${exemplares.length} exemplar(es)`}
         action={
           <div style={{ display: "flex", gap: 8 }}>
             <Btn variant="ghost" icon={Download} onClick={() => showToast("Exportação simulada do acervo.")}>Exportar</Btn>
-            <Btn variant="ghost" icon={Upload} onClick={() => showToast("Importação simulada de livros.")}>Importar</Btn>
-            {isAdmin && <Btn icon={Plus} onClick={() => { setEditing(null); setFormOpen(true); }}>Novo</Btn>}
+            {isAdmin && <Btn icon={Plus} onClick={() => setFormTitulo({})}>Novo título</Btn>}
           </div>
         }
       />
 
-      {/* Busca + toggle de visualização */}
       <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 12 }}>
         <div style={{ flex: 1 }}>
-          <SearchBar value={query} onChange={setQuery} placeholder="Buscar por título ou autor..." />
+          <SearchBar value={query} onChange={setQuery} placeholder="Buscar por título, autor ou ISBN..." />
         </div>
         <div style={{ display: "flex", gap: 2, border: `1px solid ${COLORS.border}`, borderRadius: 10, padding: 3, background: "#fff", flexShrink: 0 }}>
-          <button
-            aria-label="Visualização em grade"
-            onClick={() => setView("grade")}
-            style={{
-              padding: "7px 10px", borderRadius: 8, border: "none",
-              background: viewMode === "grade" ? COLORS.primary : "transparent",
-              color: viewMode === "grade" ? "#fff" : COLORS.neutral,
-              cursor: "pointer", display: "flex", alignItems: "center", transition: "all .15s",
-            }}
-          >
-            <LayoutGrid size={16} />
-          </button>
-          <button
-            aria-label="Visualização em lista"
-            onClick={() => setView("lista")}
-            style={{
-              padding: "7px 10px", borderRadius: 8, border: "none",
-              background: viewMode === "lista" ? COLORS.primary : "transparent",
-              color: viewMode === "lista" ? "#fff" : COLORS.neutral,
-              cursor: "pointer", display: "flex", alignItems: "center", transition: "all .15s",
-            }}
-          >
-            <List size={16} />
-          </button>
+          {[["grade", LayoutGrid], ["lista", List]].map(([mode, Icon]) => (
+            <button key={mode} aria-label={mode} onClick={() => setView(mode)} style={{ padding: "7px 10px", borderRadius: 8, border: "none", background: viewMode === mode ? COLORS.primary : "transparent", color: viewMode === mode ? "#fff" : COLORS.neutral, cursor: "pointer", display: "flex", alignItems: "center", transition: "all .15s" }}>
+              <Icon size={16} />
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Chips de categoria */}
       {allCats.length > 0 && (
         <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4, marginBottom: 10, scrollbarWidth: "none" }}>
           <FilterChip label="Todas" active={!catFilter} onClick={() => setCatFilter("")} />
-          {allCats.map((cat) => (
-            <FilterChip key={cat} label={cat} active={catFilter === cat} onClick={() => setCatFilter(catFilter === cat ? "" : cat)} />
-          ))}
+          {allCats.map((cat) => <FilterChip key={cat} label={cat} active={catFilter === cat} onClick={() => setCatFilter(catFilter === cat ? "" : cat)} />)}
         </div>
       )}
 
-      {/* Filtro de disponibilidade */}
       <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
-        {["Todos", "Disponível", "Emprestado"].map((opt) => (
+        {["Todos", "Disponível", "Emprestado", "Indisponível"].map((opt) => (
           <FilterChip key={opt} label={opt} active={availFilter === opt} onClick={() => setAvailFilter(opt)} />
         ))}
       </div>
 
-      {/* Contador */}
-      <div style={{ fontSize: 13, color: COLORS.neutral, marginBottom: 14, fontFamily: "Inter, sans-serif" }}>
-        {filtered.length} {filtered.length === 1 ? "livro encontrado" : "livros encontrados"}
+      <div style={{ fontSize: 13, color: COLORS.neutral, marginBottom: 14 }}>
+        {filtered.length} {filtered.length === 1 ? "título encontrado" : "títulos encontrados"}
       </div>
 
-      {/* Resultados */}
       {filtered.length === 0 ? (
         <div style={{ textAlign: "center", padding: "52px 20px", color: COLORS.neutral }}>
           <BookX size={40} style={{ marginBottom: 12, opacity: 0.45 }} />
-          <div style={{ fontFamily: "Inter, sans-serif", fontSize: 15, marginBottom: 16 }}>Nenhum livro corresponde aos filtros.</div>
+          <div style={{ fontSize: 15, marginBottom: 16 }}>Nenhum título corresponde aos filtros.</div>
           {hasActiveFilter && <Btn variant="ghost" onClick={clearFilters}>Limpar filtros</Btn>}
         </div>
       ) : viewMode === "grade" ? (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 12 }}>
-          {filtered.map((l) => (
-            <CatalogoCardGrade
-              key={l.id}
-              livro={l}
-              onOpen={setDetailId}
-              onEdit={(livro) => { setEditing(livro); setFormOpen(true); }}
-              onDuplicate={duplicar}
-              onDelete={setToDelete}
-              isAdmin={isAdmin}
-            />
+          {filtered.map((t) => (
+            <CatalogoCardGrade key={t.id} titulo={t} exemplares={exemplares} onOpen={setDetailId} onEdit={isAdmin ? (tt) => setFormTitulo(tt) : null} onDelete={isAdmin ? (tt) => setToDelete({ tipo: "titulo", item: tt }) : null} />
           ))}
         </div>
       ) : (
         <div style={{ display: "grid", gap: 10 }}>
-          {filtered.map((l) => (
-            <CatalogoItemLista
-              key={l.id}
-              livro={l}
-              onOpen={setDetailId}
-              onEdit={(livro) => { setEditing(livro); setFormOpen(true); }}
-              onDuplicate={duplicar}
-              onDelete={setToDelete}
-              isAdmin={isAdmin}
-            />
+          {filtered.map((t) => (
+            <CatalogoItemLista key={t.id} titulo={t} exemplares={exemplares} onOpen={setDetailId} onEdit={isAdmin ? (tt) => setFormTitulo(tt) : null} onDelete={isAdmin ? (tt) => setToDelete({ tipo: "titulo", item: tt }) : null} />
           ))}
         </div>
       )}
 
-      {formOpen && (
-        <LivroForm
-          initial={editing}
-          onSave={saveLivro}
-          onClose={() => { setFormOpen(false); setEditing(null); }}
-        />
+      {formTitulo !== null && (
+        <TituloForm initial={formTitulo?.id ? formTitulo : null} onSave={saveTitulo} onClose={() => setFormTitulo(null)} />
       )}
-      {toDelete && (
-        <Confirm
-          text={`Excluir o livro "${toDelete.titulo}"? Esta ação não pode ser desfeita.`}
-          onConfirm={() => excluir(toDelete)}
-          onCancel={() => setToDelete(null)}
-        />
+      {formExemplar !== null && (
+        <ExemplarForm initial={formExemplar?.id ? formExemplar : null} tituloId={formExemplar.tituloId || formExemplar.id && formExemplar.tituloId} onSave={saveExemplar} onClose={() => setFormExemplar(null)} />
+      )}
+      {toDelete?.tipo === "titulo" && (
+        <Confirm text={`Excluir o título "${toDelete.item.titulo}" e todos os seus exemplares?`} onConfirm={() => excluirTitulo(toDelete.item)} onCancel={() => setToDelete(null)} />
+      )}
+      {toDelete?.tipo === "exemplar" && (
+        <Confirm text={`Excluir o exemplar ${toDelete.item.tombo}?`} onConfirm={() => excluirExemplar(toDelete.item)} onCancel={() => setToDelete(null)} />
       )}
     </div>
   );
@@ -1664,159 +1680,71 @@ function FilterChip({ label, active, onClick }) {
   return (
     <button onClick={onClick} style={{
       whiteSpace: "nowrap", border: `1px solid ${active ? COLORS.primary : COLORS.border}`,
-      background: active ? COLORS.primary : "#fff",
-      color: active ? "#fff" : COLORS.ink,
+      background: active ? COLORS.primary : "#fff", color: active ? "#fff" : COLORS.ink,
       padding: "6px 14px", borderRadius: 999, fontSize: 13, fontWeight: active ? 600 : 500,
-      cursor: "pointer", fontFamily: "Inter, sans-serif", transition: "all .15s",
-      flexShrink: 0,
-    }}>
-      {label}
-    </button>
+      cursor: "pointer", fontFamily: "Inter, sans-serif", transition: "all .15s", flexShrink: 0,
+    }}>{label}</button>
   );
 }
 
-function CatalogoCardGrade({ livro, onOpen, onEdit, onDuplicate, onDelete, isAdmin }) {
+function disponibilidadeBadgeStyle(st) {
+  if (st === "Disponível") return { background: COLORS.primary, color: "#fff" };
+  if (st === "Indisponível") return { background: COLORS.neutral, color: "#fff" };
+  return { background: COLORS.accent, color: "#fff" };
+}
+
+function CatalogoCardGrade({ titulo: t, exemplares, onOpen, onEdit, onDelete }) {
   const [hovered, setHovered] = useState(false);
-  const disponivel = livro.status === "Disponível";
+  const disp = getDisponibilidadeTitulo(t.id, exemplares);
+  const st = getStatusTitulo(t.id, exemplares);
+  const total = exemplares.filter((ex) => ex.tituloId === t.id).length;
   return (
-    <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        background: "#fff", border: `1px solid ${COLORS.border}`, borderRadius: 14,
-        overflow: "hidden", display: "flex", flexDirection: "column",
-        transition: "transform .2s ease, box-shadow .2s ease",
-        transform: hovered ? "scale(1.02)" : "scale(1)",
-        boxShadow: hovered ? "0 8px 24px rgba(43,76,63,0.13)" : "0 1px 4px rgba(0,0,0,0.05)",
-      }}
-    >
-      {/* Capa */}
-      <div
-        onClick={() => onOpen(livro.id)}
-        style={{ position: "relative", width: "100%", paddingBottom: "140%", background: COLORS.bgAlt, cursor: "pointer", flexShrink: 0 }}
-      >
-        {livro.foto ? (
-          <img
-            src={livro.foto}
-            alt={livro.titulo}
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
-          />
-        ) : (
-          <div style={{
-            position: "absolute", inset: 0, display: "flex", alignItems: "center",
-            justifyContent: "center", color: COLORS.neutral,
-          }}>
-            <BookOpen size={32} style={{ opacity: 0.35 }} />
-          </div>
-        )}
-        {/* Badge de disponibilidade */}
-        <div style={{
-          position: "absolute", top: 8, right: 8,
-          background: disponivel ? COLORS.primary : COLORS.accent,
-          color: "#fff", fontSize: 11, fontWeight: 700,
-          padding: "3px 8px", borderRadius: 999, fontFamily: "Inter, sans-serif",
-          letterSpacing: 0.2,
-        }}>
-          {livro.status}
+    <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{ background: "#fff", border: `1px solid ${COLORS.border}`, borderRadius: 14, overflow: "hidden", display: "flex", flexDirection: "column", transition: "transform .2s ease, box-shadow .2s ease", transform: hovered ? "scale(1.02)" : "scale(1)", boxShadow: hovered ? "0 8px 24px rgba(43,76,63,0.13)" : "0 1px 4px rgba(0,0,0,0.05)" }}>
+      <div onClick={() => onOpen(t.id)} style={{ position: "relative", width: "100%", paddingBottom: "140%", background: COLORS.bgAlt, cursor: "pointer", flexShrink: 0 }}>
+        {t.foto ? <img src={t.foto} alt={t.titulo} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} /> : <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}><BookOpen size={32} color={COLORS.neutral} style={{ opacity: 0.35 }} /></div>}
+        <div style={{ position: "absolute", top: 8, right: 8, ...disponibilidadeBadgeStyle(st), fontSize: 10, fontWeight: 700, padding: "3px 7px", borderRadius: 999 }}>
+          {st === "Disponível" ? `${disp}/${total}` : st}
         </div>
       </div>
-
-      {/* Info */}
-      <div onClick={() => onOpen(livro.id)} style={{ padding: "10px 12px 6px", flex: 1, cursor: "pointer" }}>
-        <div style={{
-          fontFamily: "'Source Serif 4', serif", fontSize: 14, fontWeight: 600,
-          color: COLORS.ink, lineHeight: 1.3, marginBottom: 4,
-          overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
-        }}>
-          {livro.titulo}
-        </div>
-        <div style={{ fontSize: 12, color: COLORS.neutral, marginBottom: 6 }}>{livro.autor}</div>
-        {livro.generos[0] && (
-          <span style={{
-            fontSize: 11, background: COLORS.bgAlt, color: COLORS.neutral,
-            padding: "2px 8px", borderRadius: 999, display: "inline-block",
-          }}>
-            {livro.generos[0]}
-          </span>
-        )}
+      <div onClick={() => onOpen(t.id)} style={{ padding: "10px 12px 6px", flex: 1, cursor: "pointer" }}>
+        <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: 14, fontWeight: 600, color: COLORS.ink, lineHeight: 1.3, marginBottom: 4, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>{t.titulo}</div>
+        <div style={{ fontSize: 12, color: COLORS.neutral, marginBottom: 6 }}>{t.autor}</div>
+        {t.generos[0] && <span style={{ fontSize: 11, background: COLORS.bgAlt, color: COLORS.neutral, padding: "2px 8px", borderRadius: 999 }}>{t.generos[0]}</span>}
       </div>
-
-      {/* Ações admin (visíveis no hover) */}
-      {isAdmin && (
-        <div style={{
-          display: "flex", justifyContent: "flex-end", gap: 4, padding: "4px 8px 8px",
-          opacity: hovered ? 1 : 0, transition: "opacity .18s",
-        }}>
-          <Btn variant="icon" onClick={(e) => { e.stopPropagation(); onEdit(livro); }} title="Editar" style={{ padding: 5, borderRadius: 7 }}><Edit2 size={13} /></Btn>
-          <Btn variant="icon" onClick={(e) => { e.stopPropagation(); onDuplicate(livro); }} title="Duplicar" style={{ padding: 5, borderRadius: 7 }}><Copy size={13} /></Btn>
-          <Btn variant="icon" onClick={(e) => { e.stopPropagation(); onDelete(livro); }} title="Excluir" style={{ padding: 5, borderRadius: 7, color: COLORS.danger }}><Trash2 size={13} /></Btn>
+      {(onEdit || onDelete) && (
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 4, padding: "4px 8px 8px", opacity: hovered ? 1 : 0, transition: "opacity .18s" }}>
+          {onEdit && <Btn variant="icon" onClick={(e) => { e.stopPropagation(); onEdit(t); }} title="Editar" style={{ padding: 5, borderRadius: 7 }}><Edit2 size={13} /></Btn>}
+          {onDelete && <Btn variant="icon" onClick={(e) => { e.stopPropagation(); onDelete(t); }} title="Excluir" style={{ padding: 5, borderRadius: 7, color: COLORS.danger }}><Trash2 size={13} /></Btn>}
         </div>
       )}
     </div>
   );
 }
 
-function CatalogoItemLista({ livro, onOpen, onEdit, onDuplicate, onDelete, isAdmin }) {
+function CatalogoItemLista({ titulo: t, exemplares, onOpen, onEdit, onDelete }) {
   const [hovered, setHovered] = useState(false);
-  const disponivel = livro.status === "Disponível";
+  const disp = getDisponibilidadeTitulo(t.id, exemplares);
+  const st = getStatusTitulo(t.id, exemplares);
+  const total = exemplares.filter((ex) => ex.tituloId === t.id).length;
   return (
-    <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        background: "#fff", border: `1px solid ${COLORS.border}`, borderRadius: 12,
-        padding: "12px 14px", display: "flex", gap: 14, alignItems: "center",
-        transition: "transform .15s ease, box-shadow .15s ease",
-        transform: hovered ? "translateY(-1px)" : "none",
-        boxShadow: hovered ? "0 4px 14px rgba(43,76,63,0.09)" : "none",
-      }}
-    >
-      {/* Thumbnail */}
-      <div
-        onClick={() => onOpen(livro.id)}
-        style={{
-          width: 56, height: 80, borderRadius: 6, flexShrink: 0,
-          background: COLORS.bgAlt, overflow: "hidden", cursor: "pointer",
-          display: "flex", alignItems: "center", justifyContent: "center",
-        }}
-      >
-        {livro.foto
-          ? <img src={livro.foto} alt={livro.titulo} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-          : <BookOpen size={20} color={COLORS.neutral} style={{ opacity: 0.4 }} />
-        }
+    <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{ background: "#fff", border: `1px solid ${COLORS.border}`, borderRadius: 12, padding: "12px 14px", display: "flex", gap: 14, alignItems: "center", transition: "transform .15s ease, box-shadow .15s ease", transform: hovered ? "translateY(-1px)" : "none", boxShadow: hovered ? "0 4px 14px rgba(43,76,63,0.09)" : "none" }}>
+      <div onClick={() => onOpen(t.id)} style={{ width: 56, height: 80, borderRadius: 6, flexShrink: 0, background: COLORS.bgAlt, overflow: "hidden", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        {t.foto ? <img src={t.foto} alt={t.titulo} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <BookOpen size={20} color={COLORS.neutral} style={{ opacity: 0.4 }} />}
       </div>
-
-      {/* Info */}
-      <div style={{ flex: 1, minWidth: 0, cursor: "pointer" }} onClick={() => onOpen(livro.id)}>
-        <div style={{
-          fontFamily: "'Source Serif 4', serif", fontSize: 16, fontWeight: 600,
-          color: COLORS.ink, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-        }}>
-          {livro.titulo}
-        </div>
-        <div style={{ fontSize: 13, color: COLORS.neutral, margin: "2px 0 7px" }}>{livro.autor}</div>
+      <div style={{ flex: 1, minWidth: 0, cursor: "pointer" }} onClick={() => onOpen(t.id)}>
+        <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: 16, fontWeight: 600, color: COLORS.ink, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.titulo}</div>
+        <div style={{ fontSize: 13, color: COLORS.neutral, margin: "2px 0 7px" }}>{t.autor}</div>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
-          <span style={{
-            fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 999,
-            background: disponivel ? COLORS.primary : COLORS.accent, color: "#fff",
-            fontFamily: "Inter, sans-serif",
-          }}>
-            {livro.status}
+          <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 999, fontFamily: "Inter, sans-serif", ...disponibilidadeBadgeStyle(st) }}>
+            {st === "Disponível" ? `${disp} disponível${disp !== 1 ? "is" : ""} (${total})` : `${st} (${total})`}
           </span>
-          {livro.generos[0] && (
-            <span style={{ fontSize: 11, background: COLORS.bgAlt, color: COLORS.neutral, padding: "2px 8px", borderRadius: 999 }}>
-              {livro.generos[0]}
-            </span>
-          )}
+          {t.generos[0] && <span style={{ fontSize: 11, background: COLORS.bgAlt, color: COLORS.neutral, padding: "2px 8px", borderRadius: 999 }}>{t.generos[0]}</span>}
         </div>
       </div>
-
-      {/* Ações admin */}
-      {isAdmin && (
+      {(onEdit || onDelete) && (
         <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-          <Btn variant="icon" onClick={() => onEdit(livro)} title="Editar"><Edit2 size={14} /></Btn>
-          <Btn variant="icon" onClick={() => onDuplicate(livro)} title="Duplicar"><Copy size={14} /></Btn>
-          <Btn variant="icon" onClick={() => onDelete(livro)} title="Excluir" style={{ color: COLORS.danger }}><Trash2 size={14} /></Btn>
+          {onEdit && <Btn variant="icon" onClick={() => onEdit(t)} title="Editar"><Edit2 size={14} /></Btn>}
+          {onDelete && <Btn variant="icon" onClick={() => onDelete(t)} title="Excluir" style={{ color: COLORS.danger }}><Trash2 size={14} /></Btn>}
         </div>
       )}
     </div>
@@ -1832,63 +1760,34 @@ function SearchBar({ value, onChange, placeholder }) {
   );
 }
 
-function LivroForm({ initial, onSave, onClose }) {
-  const [data, setData] = useState(initial || {
-    tombo: "", isbn: "", titulo: "", autor: "", ano: "", edicao: "", editora: "", local: "", paginas: "", generos: [], conservacao: "Bom", foto: null,
-  });
+function TituloForm({ initial, onSave, onClose }) {
+  const [data, setData] = useState(initial || { isbn: "", titulo: "", autor: "", ano: "", edicao: "", editora: "", local: "", paginas: "", generos: [], foto: null });
   const [genText, setGenText] = useState((initial?.generos || []).join(", "));
   const [err, setErr] = useState("");
-
   function set(k, v) { setData((d) => ({ ...d, [k]: v })); }
-
-  function mockScan(type) {
-    if (type === "tombo") set("tombo", "T-" + String(Math.floor(1000 + Math.random() * 8999)));
-    if (type === "isbn") set("isbn", "978-85-" + Math.floor(1000 + Math.random() * 8999) + "-" + Math.floor(1000 + Math.random() * 8999));
-  }
-
   function handleFile(e) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => set("foto", reader.result);
-    reader.readAsDataURL(file);
+    const file = e.target.files?.[0]; if (!file) return;
+    const reader = new FileReader(); reader.onload = () => set("foto", reader.result); reader.readAsDataURL(file);
   }
-
   function submit(e) {
     e.preventDefault();
     if (!data.titulo.trim()) { setErr("O título é obrigatório."); return; }
     onSave({ ...data, generos: genText.split(",").map((g) => g.trim()).filter(Boolean) });
   }
-
   return (
-    <Modal title={initial ? "Editar Livro" : "Novo Livro"} onClose={onClose} width={520}>
+    <Modal title={initial ? "Editar Título" : "Novo Título"} onClose={onClose} width={520}>
       <form onSubmit={submit}>
         <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
-          <div style={{
-            width: 70, height: 96, borderRadius: 8, background: COLORS.bgAlt, flexShrink: 0,
-            display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", border: `1px solid ${COLORS.border}`,
-          }}>
+          <div style={{ width: 70, height: 96, borderRadius: 8, background: COLORS.bgAlt, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", border: `1px solid ${COLORS.border}` }}>
             {data.foto ? <img src={data.foto} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <ImageIcon size={22} color={COLORS.neutral} />}
           </div>
           <div style={{ flex: 1 }}>
-            <label style={{ fontSize: 13, fontWeight: 600, display: "block", marginBottom: 6 }}>Foto do livro</label>
+            <label style={{ fontSize: 13, fontWeight: 600, display: "block", marginBottom: 6 }}>Capa</label>
             <input type="file" accept="image/*" onChange={handleFile} style={{ fontSize: 12 }} />
-            <p style={{ fontSize: 11, color: COLORS.neutral, margin: "6px 0 0" }}>Capa ou foto do exemplar físico.</p>
           </div>
         </div>
-
-        <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
-          <Btn type="button" variant="ghost" icon={Camera} onClick={() => mockScan("tombo")} style={{ flex: 1 }}>Escanear Tombo</Btn>
-          <Btn type="button" variant="ghost" icon={Camera} onClick={() => mockScan("isbn")} style={{ flex: 1 }}>Escanear ISBN</Btn>
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          <Field label="Tombo"><Input value={data.tombo} onChange={(e) => set("tombo", e.target.value)} /></Field>
-          <Field label="ISBN"><Input value={data.isbn} onChange={(e) => set("isbn", e.target.value)} /></Field>
-        </div>
-        <Field label="Título" required>
-          <Input value={data.titulo} onChange={(e) => set("titulo", e.target.value)} />
-        </Field>
+        <Field label="ISBN"><Input value={data.isbn} onChange={(e) => set("isbn", e.target.value)} /></Field>
+        <Field label="Título" required><Input value={data.titulo} onChange={(e) => set("titulo", e.target.value)} /></Field>
         <Field label="Autor"><Input value={data.autor} onChange={(e) => set("autor", e.target.value)} /></Field>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <Field label="Ano"><Input value={data.ano} onChange={(e) => set("ano", e.target.value)} /></Field>
@@ -1896,40 +1795,115 @@ function LivroForm({ initial, onSave, onClose }) {
         </div>
         <Field label="Editora"><Input value={data.editora} onChange={(e) => set("editora", e.target.value)} /></Field>
         <Field label="Local"><Input value={data.local} onChange={(e) => set("local", e.target.value)} /></Field>
-        <Field label="Quantidade de Páginas"><Input type="number" value={data.paginas} onChange={(e) => set("paginas", e.target.value)} /></Field>
-        <Field label="Gênero / Tag" hint="Separe por vírgula"><Input value={genText} onChange={(e) => setGenText(e.target.value)} placeholder="Ex: Romance, Ficção, Técnico" /></Field>
-        <Field label="Estado de Conservação">
-          <Select value={data.conservacao} onChange={(e) => set("conservacao", e.target.value)}>
-            {ESTADOS_CONSERVACAO.map((c) => <option key={c} value={c}>{c}</option>)}
-          </Select>
-        </Field>
-
+        <Field label="Páginas"><Input type="number" value={data.paginas} onChange={(e) => set("paginas", e.target.value)} /></Field>
+        <Field label="Gênero / Tag" hint="Separe por vírgula"><Input value={genText} onChange={(e) => setGenText(e.target.value)} placeholder="Ex: Romance, Ficção, Teologia" /></Field>
         {err && <div style={{ color: COLORS.danger, fontSize: 13, marginBottom: 10 }}>{err}</div>}
-        <Btn type="submit" style={{ width: "100%", justifyContent: "center", marginTop: 6 }}>{initial ? "Salvar alterações" : "Cadastrar"}</Btn>
+        <Btn type="submit" style={{ width: "100%", justifyContent: "center", marginTop: 6 }}>{initial ? "Salvar alterações" : "Cadastrar título"}</Btn>
       </form>
     </Modal>
   );
 }
 
-function LivroDetalhe({ livro, ctx, onBack, onEdit }) {
-  const { setLivros, emprestimos, showToast, setPosts, auth } = ctx;
-  const [nota, setNota] = useState(livro.nota);
-  const [comentario, setComentario] = useState(livro.comentario);
-  const [compartilhar, setCompartilhar] = useState(false);
+function ExemplarForm({ initial, tituloId, onSave, onClose }) {
+  const [tombo, setTombo] = useState(initial?.tombo || "");
+  const [estadoConservacao, setEstadoConservacao] = useState(initial?.estadoConservacao || "Bom");
+  function mockScan() { setTombo("T-" + String(Math.floor(1000 + Math.random() * 8999))); }
+  function submit(e) {
+    e.preventDefault();
+    onSave({ tituloId: tituloId || initial?.tituloId, tombo: tombo.trim(), estadoConservacao });
+  }
+  return (
+    <Modal title={initial ? "Editar Exemplar" : "Novo Exemplar"} onClose={onClose} width={420}>
+      <form onSubmit={submit}>
+        <Btn type="button" variant="ghost" icon={Camera} onClick={mockScan} style={{ width: "100%", marginBottom: 16 }}>Escanear Tombo</Btn>
+        <Field label="Tombo"><Input value={tombo} onChange={(e) => setTombo(e.target.value)} placeholder="T-0001" /></Field>
+        <Field label="Estado de Conservação">
+          <Select value={estadoConservacao} onChange={(e) => setEstadoConservacao(e.target.value)}>
+            {ESTADOS_CONSERVACAO.map((c) => <option key={c} value={c}>{c}</option>)}
+          </Select>
+        </Field>
+        <Btn type="submit" style={{ width: "100%", justifyContent: "center", marginTop: 6 }}>{initial ? "Salvar" : "Adicionar exemplar"}</Btn>
+      </form>
+    </Modal>
+  );
+}
 
-  const historicoEmprestimos = emprestimos.filter((e) => e.livroId === livro.id);
+/* Modal para marcar exemplar como indisponível (Part A) */
+function IndisponivelModal({ exemplar, onConfirm, onClose }) {
+  const [motivo, setMotivo] = useState(exemplar.motivoIndisponivel || "");
+  return (
+    <Modal title="Marcar como Indisponível" onClose={onClose} width={420}>
+      <p style={{ fontSize: 13, color: COLORS.neutral, marginTop: 0 }}>Exemplar <strong>{exemplar.tombo}</strong> ficará indisponível para empréstimos.</p>
+      <Field label="Motivo (opcional)"><Textarea value={motivo} onChange={(e) => setMotivo(e.target.value)} placeholder="Ex: Em restauro, aguardando encadernação..." /></Field>
+      <Btn onClick={() => onConfirm(motivo)} style={{ width: "100%", justifyContent: "center" }}>Confirmar</Btn>
+    </Modal>
+  );
+}
+
+/* Modal para solicitar empréstimo (leitor — Part B) */
+function SolicitacaoModal({ titulo, onConfirm, onClose }) {
+  const [dataDesejada, setDataDesejada] = useState("");
+  return (
+    <Modal title="Solicitar Empréstimo" onClose={onClose} width={420}>
+      <p style={{ fontSize: 13, color: COLORS.neutral, marginTop: 0 }}>Você está solicitando o empréstimo de <strong>{titulo.titulo}</strong>. O administrador confirmará e selecionará um exemplar.</p>
+      <Field label="Data de devolução desejada (opcional)"><Input type="date" value={dataDesejada} onChange={(e) => setDataDesejada(e.target.value)} min={todayISO()} /></Field>
+      <Btn onClick={() => onConfirm(dataDesejada)} style={{ width: "100%", justifyContent: "center" }}>Enviar solicitação</Btn>
+    </Modal>
+  );
+}
+
+function TituloDetalhe({ titulo, ctx, onBack, onEditTitulo, onAddExemplar, onEditExemplar, onDeleteExemplar }) {
+  const { setTitulos, exemplares, setExemplares, emprestimos, showToast, setPosts, auth, solicitacoes, setSolicitacoes, listaEspera, setListaEspera } = ctx;
+  const isAdmin = auth.perfil === "administrador";
+  const [nota, setNota] = useState(titulo.nota);
+  const [comentario, setComentario] = useState(titulo.comentario);
+  const [compartilhar, setCompartilhar] = useState(false);
+  const [indispModal, setIndispModal] = useState(null); // exemplar a marcar
+  const [solicitarModal, setSolicitarModal] = useState(false);
+
+  const exsDoTitulo = exemplares.filter((ex) => ex.tituloId === titulo.id);
+  const disp = getDisponibilidadeTitulo(titulo.id, exemplares);
+  const minhasolicPendente = solicitacoes.find((s) => s.tituloId === titulo.id && s.solicitanteCpf === auth.cpf && s.status === "pendente");
+  const minhaFilaEntry = listaEspera.find((le) => le.tituloId === titulo.id && le.usuarioCpf === auth.cpf);
+  const filaDoTitulo = listaEspera.filter((le) => le.tituloId === titulo.id).sort((a, b) => a.dataEntrada.localeCompare(b.dataEntrada));
+
+  const historicoEmprestimos = emprestimos.filter((e) => exsDoTitulo.some((ex) => ex.id === e.exemplarId)).sort((a, b) => b.dataEmprestimo.localeCompare(a.dataEmprestimo));
 
   function salvarAvaliacao() {
-    setLivros((prev) => prev.map((l) => (l.id === livro.id ? { ...l, nota, comentario } : l)));
-    if (compartilhar) {
-      setPosts((prev) => [{
-        id: uid("P"), autor: auth.nome,
-        texto: `Avaliei "${livro.titulo}" com ${nota} estrela(s): ${comentario || "(sem comentário)"}`,
-        data: new Date().toISOString(), likes: [], comentarios: [],
-      }, ...prev]);
-    }
+    setTitulos((prev) => prev.map((t) => t.id === titulo.id ? { ...t, nota, comentario } : t));
+    if (compartilhar) setPosts((prev) => [{ id: uid("P"), autor: auth.nome, texto: `Avaliei "${titulo.titulo}" com ${nota} estrela(s): ${comentario || "(sem comentário)"}`, data: new Date().toISOString(), likes: [], comentarios: [] }, ...prev]);
     showToast("Avaliação salva." + (compartilhar ? " Compartilhada na comunidade." : ""));
   }
+
+  function marcarIndisponivel(ex, motivo) {
+    setExemplares((prev) => prev.map((x) => x.id === ex.id ? { ...x, status: "Indisponível", motivoIndisponivel: motivo || null } : x));
+    setIndispModal(null);
+    showToast("Exemplar marcado como indisponível.");
+  }
+
+  function disponibilizar(ex) {
+    setExemplares((prev) => prev.map((x) => x.id === ex.id ? { ...x, status: "Disponível", motivoIndisponivel: null } : x));
+    showToast("Exemplar disponibilizado.");
+  }
+
+  function solicitarEmprestimo(dataDesejada) {
+    setSolicitacoes((prev) => [...prev, { id: uid("S"), tituloId: titulo.id, solicitanteCpf: auth.cpf, solicitanteNome: auth.nome, dataSolicitacao: new Date().toISOString(), dataDesejada: dataDesejada || null, status: "pendente" }]);
+    setSolicitarModal(false);
+    showToast("Solicitação enviada. Aguarde confirmação do administrador.");
+  }
+
+  function entrarFila() {
+    if (minhaFilaEntry) { showToast("Você já está na lista de espera."); return; }
+    setListaEspera((prev) => [...prev, { id: uid("LE"), tituloId: titulo.id, usuarioCpf: auth.cpf, usuarioNome: auth.nome, dataEntrada: new Date().toISOString() }]);
+    showToast("Você entrou na lista de espera.");
+  }
+
+  function sairFila() {
+    setListaEspera((prev) => prev.filter((le) => !(le.tituloId === titulo.id && le.usuarioCpf === auth.cpf)));
+    showToast("Você saiu da lista de espera.");
+  }
+
+  const exStatusColor = (st) => st === "Disponível" ? COLORS.success : st === "Indisponível" ? COLORS.neutral : COLORS.accent;
 
   return (
     <div>
@@ -1939,20 +1913,87 @@ function LivroDetalhe({ livro, ctx, onBack, onEdit }) {
 
       <div style={{ display: "flex", gap: 18, marginBottom: 22, flexWrap: "wrap" }}>
         <div style={{ width: 110, height: 150, borderRadius: 10, background: COLORS.bgAlt, flexShrink: 0, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          {livro.foto ? <img src={livro.foto} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <ImageIcon size={28} color={COLORS.neutral} />}
+          {titulo.foto ? <img src={titulo.foto} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <ImageIcon size={28} color={COLORS.neutral} />}
         </div>
-        <div style={{ flex: 1, minWidth: 220 }}>
-          <h1 style={{ fontFamily: "'Source Serif 4', serif", fontSize: 26, margin: 0, color: COLORS.primaryDark }}>{livro.titulo}</h1>
-          <p style={{ color: COLORS.neutral, margin: "4px 0 10px" }}>{livro.autor} · {livro.ano} · {livro.editora}</p>
+        <div style={{ flex: 1, minWidth: 200 }}>
+          <h1 style={{ fontFamily: "'Source Serif 4', serif", fontSize: 26, margin: 0, color: COLORS.primaryDark }}>{titulo.titulo}</h1>
+          <p style={{ color: COLORS.neutral, margin: "4px 0 10px" }}>{titulo.autor} · {titulo.ano} · {titulo.editora}</p>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
-            <Badge tone={livro.status === "Disponível" ? "success" : "accent"}>{livro.status}</Badge>
-            <Badge>{livro.conservacao}</Badge>
-            {livro.generos.map((g) => <Badge key={g} tone="neutral">{g}</Badge>)}
+            <Badge tone={disp > 0 ? "success" : "accent"}>{disp > 0 ? `${disp} disponível${disp !== 1 ? "is" : ""}` : "Sem disponível"}</Badge>
+            {titulo.generos.map((g) => <Badge key={g} tone="neutral">{g}</Badge>)}
           </div>
-          <p style={{ fontSize: 13, color: COLORS.neutral, margin: 0 }}>Tombo {livro.tombo} · ISBN {livro.isbn} · {livro.paginas} págs · {livro.local}</p>
-          <Btn variant="ghost" icon={Edit2} onClick={onEdit} style={{ marginTop: 12 }}>Editar cadastro</Btn>
+          <p style={{ fontSize: 13, color: COLORS.neutral, margin: 0 }}>ISBN {titulo.isbn} · {titulo.paginas} págs · {titulo.local}</p>
+          {isAdmin && <Btn variant="ghost" icon={Edit2} onClick={onEditTitulo} style={{ marginTop: 12 }}>Editar título</Btn>}
+
+          {/* Part B: Reader loan request or Part D: waitlist */}
+          {!isAdmin && (
+            <div style={{ marginTop: 14 }}>
+              {disp > 0 ? (
+                minhasolicPendente ? (
+                  <div style={{ fontSize: 13, color: COLORS.warn, display: "flex", alignItems: "center", gap: 6 }}><Clock size={14} /> Solicitação enviada — aguardando confirmação</div>
+                ) : (
+                  <Btn icon={BookOpen} onClick={() => setSolicitarModal(true)}>Solicitar empréstimo</Btn>
+                )
+              ) : (
+                minhaFilaEntry ? (
+                  <div>
+                    <div style={{ fontSize: 13, color: COLORS.neutral, marginBottom: 8 }}>Você está na fila (posição {filaDoTitulo.findIndex((le) => le.usuarioCpf === auth.cpf) + 1})</div>
+                    <Btn variant="ghost" onClick={sairFila}>Sair da fila</Btn>
+                  </div>
+                ) : (
+                  <Btn variant="ghost" icon={Clock} onClick={entrarFila}>Entrar na lista de espera</Btn>
+                )
+              )}
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Exemplares — Part A */}
+      <Section title={`Exemplares (${exsDoTitulo.length})`}>
+        {exsDoTitulo.length === 0 ? (
+          <p style={{ fontSize: 13, color: COLORS.neutral }}>Nenhum exemplar cadastrado.</p>
+        ) : (
+          <div style={{ display: "grid", gap: 8 }}>
+            {exsDoTitulo.map((ex) => (
+              <div key={ex.id} style={{ border: `1px solid ${COLORS.border}`, borderRadius: 10, padding: "12px 14px", display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600 }}>{ex.tombo || "Sem tombo"}</div>
+                  <div style={{ fontSize: 12, color: COLORS.neutral }}>Conservação: {ex.estadoConservacao}</div>
+                  {ex.motivoIndisponivel && <div style={{ fontSize: 11, color: COLORS.neutral, fontStyle: "italic" }}>{ex.motivoIndisponivel}</div>}
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 999, color: exStatusColor(ex.status), background: ex.status === "Disponível" ? COLORS.successBg : ex.status === "Indisponível" ? COLORS.bgAlt : COLORS.accentLight }}>{ex.status}</span>
+                  {isAdmin && (
+                    <>
+                      {ex.status === "Disponível" && <Btn variant="ghost" style={{ padding: "5px 10px", fontSize: 12 }} onClick={() => setIndispModal(ex)}>Indisponibilizar</Btn>}
+                      {ex.status === "Indisponível" && <Btn variant="ghost" style={{ padding: "5px 10px", fontSize: 12 }} onClick={() => disponibilizar(ex)}>Disponibilizar</Btn>}
+                      <Btn variant="icon" onClick={() => onEditExemplar(ex)} title="Editar"><Edit2 size={13} /></Btn>
+                      <Btn variant="icon" onClick={() => onDeleteExemplar(ex)} title="Excluir" style={{ color: COLORS.danger }}><Trash2 size={13} /></Btn>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        {isAdmin && <Btn variant="ghost" icon={Plus} onClick={onAddExemplar} style={{ marginTop: 12 }}>Adicionar exemplar</Btn>}
+      </Section>
+
+      {/* Part D: Lista de espera (admin view) */}
+      {isAdmin && filaDoTitulo.length > 0 && (
+        <Section title={`Lista de espera (${filaDoTitulo.length})`}>
+          <div style={{ display: "grid", gap: 6 }}>
+            {filaDoTitulo.map((le, i) => (
+              <div key={le.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", border: `1px solid ${COLORS.border}`, borderRadius: 8, fontSize: 13 }}>
+                <span style={{ fontSize: 11, color: COLORS.neutral, width: 20, flexShrink: 0 }}>{i + 1}.</span>
+                <span style={{ flex: 1 }}>{le.usuarioNome}</span>
+                <span style={{ fontSize: 11, color: COLORS.neutral }}>{fmtDate(le.dataEntrada.slice(0, 10))}</span>
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
 
       <Section title="Avaliação e comentário">
         <Stars value={nota} onChange={setNota} size={24} />
@@ -1964,39 +2005,28 @@ function LivroDetalhe({ livro, ctx, onBack, onEdit }) {
         <Btn onClick={salvarAvaliacao} style={{ marginTop: 10 }}>Salvar avaliação</Btn>
       </Section>
 
-      <Section title="Histórico de empréstimos deste exemplar">
+      <Section title="Histórico de empréstimos deste título">
         {historicoEmprestimos.length === 0 ? (
-          <p style={{ fontSize: 13, color: COLORS.neutral }}>Este livro ainda não foi emprestado.</p>
+          <p style={{ fontSize: 13, color: COLORS.neutral }}>Nenhum empréstimo registrado.</p>
         ) : (
           <div style={{ display: "grid", gap: 8 }}>
-            {historicoEmprestimos.map((e) => (
-              <div key={e.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", border: `1px solid ${COLORS.border}`, borderRadius: 10, padding: "10px 14px", fontSize: 13 }}>
-                <div>
-                  <strong>{e.locatario}</strong> · {fmtDate(e.dataEmprestimo)} → {fmtDate(e.dataDevolucao)}
+            {historicoEmprestimos.map((e) => {
+              const ex = exemplares.find((x) => x.id === e.exemplarId);
+              return (
+                <div key={e.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", border: `1px solid ${COLORS.border}`, borderRadius: 10, padding: "10px 14px", fontSize: 13 }}>
+                  <div>
+                    <strong>{e.locatario}</strong> · {ex?.tombo} · {fmtDate(e.dataEmprestimo)} → {fmtDate(e.dataDevolucao)}
+                  </div>
+                  <StatusBadge status={e.status} />
                 </div>
-                <StatusBadge status={e.status} />
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </Section>
 
-      <Section title="Histórico de alterações do cadastro">
-        {livro.historico.length === 0 ? (
-          <p style={{ fontSize: 13, color: COLORS.neutral }}>Nenhuma alteração registrada ainda.</p>
-        ) : (
-          <div style={{ display: "grid", gap: 0 }}>
-            {livro.historico.map((h, i) => (
-              <div key={i} style={{ display: "flex", gap: 12, padding: "10px 0", borderBottom: i < livro.historico.length - 1 ? `1px solid ${COLORS.border}` : "none" }}>
-                <History size={15} color={COLORS.neutral} style={{ marginTop: 2, flexShrink: 0 }} />
-                <div style={{ fontSize: 13 }}>
-                  <strong>{h.campo}</strong> — {h.usuario} · {fmtDateTime(h.data)}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </Section>
+      {indispModal && <IndisponivelModal exemplar={indispModal} onConfirm={(motivo) => marcarIndisponivel(indispModal, motivo)} onClose={() => setIndispModal(null)} />}
+      {solicitarModal && <SolicitacaoModal titulo={titulo} onConfirm={solicitarEmprestimo} onClose={() => setSolicitarModal(false)} />}
     </div>
   );
 }
@@ -2019,58 +2049,81 @@ function StatusBadge({ status }) {
    SCREEN: EMPRÉSTIMOS
    ========================================================================= */
 function EmprestimosScreen({ ctx }) {
-  const { emprestimos, setEmprestimos, livros, setLivros, sendNotif, showToast, setRenovacoes, auth, configNotif } = ctx;
+  const { emprestimos, setEmprestimos, titulos, exemplares, setExemplares, solicitacoes, setSolicitacoes, sendNotif, showToast, setRenovacoes, auth, configNotif } = ctx;
   const isAdmin = auth.perfil === "administrador";
+  const [tab, setTab] = useState("ativos");
   const [query, setQuery] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [renovarTarget, setRenovarTarget] = useState(null);
   const [toReturn, setToReturn] = useState(null);
+  const [confirmarSol, setConfirmarSol] = useState(null); // solicitacao to confirm
+  const [recusarSol, setRecusarSol] = useState(null); // solicitacao to recuse
+
+  const pendentesCount = solicitacoes.filter((s) => s.status === "pendente").length;
 
   const filtered = emprestimos.filter((e) => {
     const q = query.toLowerCase();
-    const livro = livros.find((l) => l.id === e.livroId);
-    return !q || e.locatario.toLowerCase().includes(q) || (livro && livro.titulo.toLowerCase().includes(q));
+    const titulo = getTituloFromEmprestimo(e, exemplares, titulos);
+    const matchesQuery = !q || e.locatario.toLowerCase().includes(q) || (titulo && titulo.titulo.toLowerCase().includes(q));
+    if (tab === "ativos") return matchesQuery && (e.status === "Ativo" || e.status === "Atrasado");
+    return matchesQuery;
   });
 
   function registrar(data) {
-    const livro = livros.find((l) => l.id === data.livroId);
-    const novo = { id: uid("E"), ...data, status: "Ativo", renovacao: null };
+    const titulo = titulos.find((t) => t.id === data.tituloId);
+    const exemplar = exemplares.find((ex) => ex.id === data.exemplarId);
+    const novo = { id: uid("E"), exemplarId: data.exemplarId, locatario: data.locatario, locatarioCpf: data.locatarioCpf || null, dataEmprestimo: todayISO(), dataDevolucao: data.dataDevolucao, observacoes: data.observacoes || "", status: "Ativo", renovacao: null };
     setEmprestimos((prev) => [novo, ...prev]);
-    setLivros((prev) => prev.map((l) => (l.id === data.livroId ? { ...l, status: "Emprestado" } : l)));
+    setExemplares((prev) => prev.map((ex) => ex.id === data.exemplarId ? { ...ex, status: "Emprestado", emprestimoAtualId: novo.id } : ex));
     const cfg = configNotif.find((c) => c.id === "reserva");
     const texto = (cfg?.texto || "")
       .replace("{nome_locatario}", data.locatario)
-      .replace("{nome_livro}", livro?.titulo || "")
+      .replace("{nome_livro}", titulo?.titulo || "")
       .replace("{data_devolucao}", fmtDate(data.dataDevolucao));
     sendNotif("Reserva confirmada", data.locatario, texto);
-    showToast("Empréstimo registrado e mensagem de confirmação enviada (simulada).");
+    showToast("Empréstimo registrado e notificação enviada (simulada).");
     setFormOpen(false);
   }
 
   function devolver(e) {
     const agora = new Date().toISOString();
-    setEmprestimos((prev) => prev.map((x) => (x.id === e.id ? {
-      ...x,
-      status: "Devolvido",
-      dataDevolvido: agora,
-      devolvidoPor: auth.nome,
-      dataDevolucaoEfetiva: todayISO(),
-    } : x)));
-    setLivros((prev) => prev.map((l) => (l.id === e.livroId ? { ...l, status: "Disponível" } : l)));
+    setEmprestimos((prev) => prev.map((x) => x.id === e.id ? { ...x, status: "Devolvido", dataDevolvido: agora, devolvidoPor: auth.nome, dataDevolucaoEfetiva: todayISO() } : x));
+    setExemplares((prev) => prev.map((ex) => ex.id === e.exemplarId ? { ...ex, status: "Disponível", emprestimoAtualId: null } : ex));
     setToReturn(null);
     showToast("Devolução registrada.");
   }
 
   function solicitarRenovacao(emprestimo, justificativa, novaDataSugerida) {
-    setRenovacoes((prev) => [{
-      id: uid("R"), emprestimoId: emprestimo.id, locatario: emprestimo.locatario,
-      livroId: emprestimo.livroId, justificativa, status: "Solicitada", dataSolicitacao: new Date().toISOString(),
-      novaDataSugerida,
-    }, ...prev]);
-    setEmprestimos((prev) => prev.map((e) => (e.id === emprestimo.id ? { ...e, renovacao: "Solicitada" } : e)));
+    setRenovacoes((prev) => [{ id: uid("R"), emprestimoId: emprestimo.id, locatario: emprestimo.locatario, exemplarId: emprestimo.exemplarId, justificativa, status: "Solicitada", dataSolicitacao: new Date().toISOString(), novaDataSugerida }, ...prev]);
+    setEmprestimos((prev) => prev.map((e) => e.id === emprestimo.id ? { ...e, renovacao: "Solicitada" } : e));
     setRenovarTarget(null);
     showToast("Solicitação de renovação enviada ao administrador.");
   }
+
+  function confirmarSolicitacao(sol, exemplarId, dataEmprestimo, dataDevolucao) {
+    const titulo = titulos.find((t) => t.id === sol.tituloId);
+    const novo = { id: uid("E"), exemplarId, locatario: sol.solicitanteNome, locatarioCpf: sol.solicitanteCpf, dataEmprestimo, dataDevolucao, observacoes: "", status: "Ativo", renovacao: null };
+    setEmprestimos((prev) => [novo, ...prev]);
+    setExemplares((prev) => prev.map((ex) => ex.id === exemplarId ? { ...ex, status: "Emprestado", emprestimoAtualId: novo.id } : ex));
+    setSolicitacoes((prev) => prev.map((s) => s.id === sol.id ? { ...s, status: "confirmada", emprestimoId: novo.id } : s));
+    sendNotif("Empréstimo confirmado", sol.solicitanteNome, `Seu empréstimo de "${titulo?.titulo}" foi confirmado! Devolução até ${fmtDate(dataDevolucao)}.`);
+    setConfirmarSol(null);
+    showToast("Solicitação confirmada e leitor notificado.");
+  }
+
+  function recusarSolicitacao(sol, justificativa) {
+    const titulo = titulos.find((t) => t.id === sol.tituloId);
+    setSolicitacoes((prev) => prev.map((s) => s.id === sol.id ? { ...s, status: "recusada", justificativaRecusa: justificativa } : s));
+    sendNotif("Solicitação recusada", sol.solicitanteNome, `Sua solicitação de empréstimo de "${titulo?.titulo}" foi recusada. Motivo: ${justificativa}`);
+    setRecusarSol(null);
+    showToast("Solicitação recusada e leitor notificado.");
+  }
+
+  const tabs = [
+    { key: "ativos", label: "Ativos" },
+    { key: "todos", label: "Todos" },
+    ...(isAdmin ? [{ key: "solicitacoes", label: "Solicitações", badge: pendentesCount }] : []),
+  ];
 
   return (
     <div>
@@ -2079,104 +2132,255 @@ function EmprestimosScreen({ ctx }) {
         subtitle={`${emprestimos.filter((e) => e.status !== "Devolvido").length} em andamento`}
         action={
           <div style={{ display: "flex", gap: 8 }}>
-            <Btn variant="ghost" icon={Download} onClick={() => showToast("Exportação simulada de empréstimos.")}>Exportar</Btn>
-            <Btn variant="ghost" icon={Upload} onClick={() => showToast("Importação simulada de empréstimos.")}>Importar</Btn>
+            <Btn variant="ghost" icon={Download} onClick={() => showToast("Exportação simulada.")}>Exportar</Btn>
             {isAdmin && <Btn icon={Plus} onClick={() => setFormOpen(true)}>Novo</Btn>}
           </div>
         }
       />
-      <SearchBar value={query} onChange={setQuery} placeholder="Buscar por locatário ou livro..." />
 
-      {filtered.length === 0 ? (
-        <EmptyState icon={RefreshCw} text="Nenhum empréstimo encontrado." />
+      {/* Tab bar */}
+      <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
+        {tabs.map((t) => (
+          <button key={t.key} onClick={() => setTab(t.key)} style={{ padding: "7px 14px", borderRadius: 999, border: `1px solid ${tab === t.key ? COLORS.primary : COLORS.border}`, background: tab === t.key ? COLORS.primary : "#fff", color: tab === t.key ? "#fff" : COLORS.ink, cursor: "pointer", fontSize: 13, fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
+            {t.label}
+            {t.badge > 0 && <span style={{ background: COLORS.danger, color: "#fff", borderRadius: 999, fontSize: 11, fontWeight: 700, minWidth: 18, height: 18, display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "0 5px" }}>{t.badge}</span>}
+          </button>
+        ))}
+      </div>
+
+      {tab === "solicitacoes" ? (
+        <SolicitacoesTab solicitacoes={solicitacoes} titulos={titulos} exemplares={exemplares} onConfirmar={setConfirmarSol} onRecusar={setRecusarSol} />
       ) : (
-        <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
-          {filtered.map((e) => {
-            const livro = livros.find((l) => l.id === e.livroId);
-            const isOwn = auth.perfil === "leitor" && e.locatario.toLowerCase().includes(auth.nome.split(" ")[0].toLowerCase());
-            const podeAgir = isAdmin || isOwn;
-            return (
-              <div key={e.id} style={{
-                background: "#fff", border: `1px solid ${e.status === "Atrasado" ? COLORS.danger : COLORS.border}`,
-                borderRadius: 14, padding: 16,
-              }}>
-                <div style={{ display: "flex", justifyContent: "space-between", gap: 10, marginBottom: 6 }}>
-                  <h3 style={{ margin: 0, fontFamily: "'Source Serif 4', serif", fontSize: 16 }}>{livro?.titulo || "Livro removido"}</h3>
-                  <StatusBadge status={e.status} />
-                </div>
-                <p style={{ margin: "0 0 2px", fontSize: 13, color: COLORS.neutral }}>Para: {e.locatario}</p>
-                <p style={{ margin: "0 0 2px", fontSize: 13, color: COLORS.neutral }}>Empréstimo: {fmtDate(e.dataEmprestimo)}</p>
-                <p style={{ margin: "0 0 6px", fontSize: 13, color: COLORS.neutral }}>Prazo: {fmtDate(e.dataDevolucao)}</p>
-                {e.observacoes && <p style={{ margin: "0 0 8px", fontSize: 12, fontStyle: "italic", color: COLORS.neutral }}>{e.observacoes}</p>}
-                {e.renovacao && <Badge tone="warn">Renovação {e.renovacao}</Badge>}
-                {e.status === "Devolvido" && e.dataDevolvido && (
-                  <div style={{
-                    marginTop: 8, background: COLORS.successBg,
-                    border: `1px solid ${COLORS.success}33`, borderRadius: 8,
-                    padding: "7px 11px", fontSize: 12, color: COLORS.success,
-                    display: "flex", alignItems: "center", gap: 6,
-                  }}>
-                    <CheckCircle2 size={13} />
-                    <span>Devolvido em {fmtDateTime(e.dataDevolvido)} · confirmado por <strong>{e.devolvidoPor}</strong></span>
+        <>
+          <SearchBar value={query} onChange={setQuery} placeholder="Buscar por locatário ou livro..." />
+          {filtered.length === 0 ? (
+            <EmptyState icon={RefreshCw} text="Nenhum empréstimo encontrado." />
+          ) : (
+            <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
+              {filtered.map((e) => {
+                const titulo = getTituloFromEmprestimo(e, exemplares, titulos);
+                const isOwn = auth.perfil === "leitor" && (e.locatarioCpf === auth.cpf || e.locatario.toLowerCase().includes(auth.nome.split(" ")[0].toLowerCase()));
+                const podeAgir = isAdmin || isOwn;
+                return (
+                  <div key={e.id} style={{ background: "#fff", border: `1px solid ${e.status === "Atrasado" ? COLORS.danger : COLORS.border}`, borderRadius: 14, padding: 16 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 10, marginBottom: 6 }}>
+                      <h3 style={{ margin: 0, fontFamily: "'Source Serif 4', serif", fontSize: 16 }}>{titulo?.titulo || "Livro removido"}</h3>
+                      <StatusBadge status={e.status} />
+                    </div>
+                    <p style={{ margin: "0 0 2px", fontSize: 13, color: COLORS.neutral }}>Para: {e.locatario}</p>
+                    <p style={{ margin: "0 0 2px", fontSize: 13, color: COLORS.neutral }}>Empréstimo: {fmtDate(e.dataEmprestimo)}</p>
+                    <p style={{ margin: "0 0 6px", fontSize: 13, color: COLORS.neutral }}>Prazo: {fmtDate(e.dataDevolucao)}</p>
+                    {e.observacoes && <p style={{ margin: "0 0 8px", fontSize: 12, fontStyle: "italic", color: COLORS.neutral }}>{e.observacoes}</p>}
+                    {e.renovacao && <Badge tone="warn">Renovação {e.renovacao}</Badge>}
+                    {e.status === "Devolvido" && e.dataDevolvido && (
+                      <div style={{ marginTop: 8, background: COLORS.successBg, border: `1px solid ${COLORS.success}33`, borderRadius: 8, padding: "7px 11px", fontSize: 12, color: COLORS.success, display: "flex", alignItems: "center", gap: 6 }}>
+                        <CheckCircle2 size={13} />
+                        <span>Devolvido em {fmtDateTime(e.dataDevolvido)} · confirmado por <strong>{e.devolvidoPor}</strong></span>
+                      </div>
+                    )}
+                    {(e.status === "Ativo" || e.status === "Atrasado") && podeAgir && (
+                      <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
+                        {isAdmin && <Btn variant="subtle" icon={CheckCircle2} onClick={() => setToReturn(e)}>Devolver</Btn>}
+                        {isOwn && !e.renovacao && <Btn variant="ghost" icon={Send} onClick={() => setRenovarTarget(e)}>Solicitar renovação</Btn>}
+                      </div>
+                    )}
                   </div>
-                )}
-                {(e.status === "Ativo" || e.status === "Atrasado") && podeAgir && (
-                  <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
-                    {isAdmin && <Btn variant="subtle" icon={CheckCircle2} onClick={() => setToReturn(e)}>Devolver</Btn>}
-                    {isOwn && !e.renovacao && <Btn variant="ghost" icon={Send} onClick={() => setRenovarTarget(e)}>Solicitar renovação</Btn>}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+                );
+              })}
+            </div>
+          )}
+        </>
       )}
 
-      {formOpen && (
-        <NovoEmprestimoForm livros={livros.filter((l) => l.status !== "Emprestado")} onSave={registrar} onClose={() => setFormOpen(false)} />
+      {formOpen && <NovoEmprestimoForm titulos={titulos} exemplares={exemplares} ctx={ctx} onSave={registrar} onClose={() => setFormOpen(false)} />}
+      {renovarTarget && <RenovacaoForm emprestimo={renovarTarget} onSave={solicitarRenovacao} onClose={() => setRenovarTarget(null)} />}
+      {toReturn && <Confirm text="Confirmar a devolução deste exemplar?" onConfirm={() => devolver(toReturn)} onCancel={() => setToReturn(null)} />}
+      {confirmarSol && <ConfirmarSolicitacaoModal sol={confirmarSol} titulos={titulos} exemplares={exemplares} onConfirm={confirmarSolicitacao} onClose={() => setConfirmarSol(null)} />}
+      {recusarSol && <RecusarSolicitacaoModal sol={recusarSol} onConfirm={(just) => recusarSolicitacao(recusarSol, just)} onClose={() => setRecusarSol(null)} />}
+    </div>
+  );
+}
+
+function SolicitacoesTab({ solicitacoes, titulos, exemplares, onConfirmar, onRecusar }) {
+  const pendentes = solicitacoes.filter((s) => s.status === "pendente");
+  const outras = solicitacoes.filter((s) => s.status !== "pendente").slice(0, 20);
+  if (solicitacoes.length === 0) return <EmptyState icon={Clock} text="Nenhuma solicitação de empréstimo ainda." />;
+  return (
+    <div>
+      {pendentes.length > 0 && (
+        <>
+          <div style={{ fontSize: 13, fontWeight: 600, color: COLORS.neutral, marginBottom: 10 }}>Pendentes ({pendentes.length})</div>
+          <div style={{ display: "grid", gap: 10, marginBottom: 20 }}>
+            {pendentes.map((s) => {
+              const titulo = titulos.find((t) => t.id === s.tituloId);
+              const disp = getDisponibilidadeTitulo(s.tituloId, exemplares);
+              return (
+                <div key={s.id} style={{ background: "#fff", border: `1px solid ${COLORS.border}`, borderRadius: 14, padding: 16 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 10, marginBottom: 6 }}>
+                    <h3 style={{ margin: 0, fontFamily: "'Source Serif 4', serif", fontSize: 16 }}>{titulo?.titulo}</h3>
+                    <Badge tone="warn">Pendente</Badge>
+                  </div>
+                  <p style={{ fontSize: 13, color: COLORS.neutral, margin: "0 0 2px" }}>Solicitante: <strong>{s.solicitanteNome}</strong></p>
+                  <p style={{ fontSize: 12, color: COLORS.neutral, margin: "0 0 6px" }}>Solicitado em {fmtDate(s.dataSolicitacao.slice(0, 10))}{s.dataDesejada ? ` · Devolução desejada: ${fmtDate(s.dataDesejada)}` : ""}</p>
+                  {disp === 0 && <div style={{ fontSize: 12, color: COLORS.danger, marginBottom: 8 }}>Nenhum exemplar disponível no momento</div>}
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <Btn variant="subtle" icon={CheckCircle2} onClick={() => onConfirmar(s)} disabled={disp === 0}>Confirmar</Btn>
+                    <Btn variant="danger" style={{ background: "transparent" }} icon={XCircle} onClick={() => onRecusar(s)}>Recusar</Btn>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
       )}
-      {renovarTarget && (
-        <RenovacaoForm emprestimo={renovarTarget} onSave={solicitarRenovacao} onClose={() => setRenovarTarget(null)} />
-      )}
-      {toReturn && (
-        <Confirm text={`Confirmar a devolução deste exemplar?`} onConfirm={() => devolver(toReturn)} onCancel={() => setToReturn(null)} />
+      {outras.length > 0 && (
+        <>
+          <div style={{ fontSize: 13, fontWeight: 600, color: COLORS.neutral, marginBottom: 10 }}>Histórico</div>
+          <div style={{ display: "grid", gap: 8 }}>
+            {outras.map((s) => {
+              const titulo = titulos.find((t) => t.id === s.tituloId);
+              return (
+                <div key={s.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", border: `1px solid ${COLORS.border}`, borderRadius: 10, padding: "10px 14px", fontSize: 13 }}>
+                  <span><strong>{s.solicitanteNome}</strong> · {titulo?.titulo}</span>
+                  <Badge tone={s.status === "confirmada" ? "success" : "danger"}>{s.status}</Badge>
+                </div>
+              );
+            })}
+          </div>
+        </>
       )}
     </div>
   );
 }
 
-function NovoEmprestimoForm({ livros, onSave, onClose }) {
-  const [livroId, setLivroId] = useState("");
-  const [locatario, setLocatario] = useState("");
+function ConfirmarSolicitacaoModal({ sol, titulos, exemplares, onConfirm, onClose }) {
+  const titulo = titulos.find((t) => t.id === sol.tituloId);
+  const disponiveis = exemplares.filter((ex) => ex.tituloId === sol.tituloId && ex.status === "Disponível");
+  const [exemplarId, setExemplarId] = useState(disponiveis[0]?.id || "");
+  const [dataEmprestimo, setDataEmprestimo] = useState(todayISO());
+  const [dataDevolucao, setDataDevolucao] = useState(sol.dataDesejada || addDays(todayISO(), 14));
+  return (
+    <Modal title="Confirmar Solicitação" onClose={onClose} width={440}>
+      <p style={{ fontSize: 13, color: COLORS.neutral, marginTop: 0 }}>Confirmando empréstimo de <strong>{titulo?.titulo}</strong> para <strong>{sol.solicitanteNome}</strong>.</p>
+      <Field label="Exemplar" required>
+        <Select value={exemplarId} onChange={(e) => setExemplarId(e.target.value)}>
+          {disponiveis.map((ex) => <option key={ex.id} value={ex.id}>{ex.tombo} — {ex.estadoConservacao}</option>)}
+        </Select>
+      </Field>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        <Field label="Data empréstimo"><Input type="date" value={dataEmprestimo} onChange={(e) => setDataEmprestimo(e.target.value)} /></Field>
+        <Field label="Data devolução"><Input type="date" value={dataDevolucao} onChange={(e) => setDataDevolucao(e.target.value)} min={dataEmprestimo} /></Field>
+      </div>
+      <Btn onClick={() => onConfirm(sol, exemplarId, dataEmprestimo, dataDevolucao)} style={{ width: "100%", justifyContent: "center" }} disabled={!exemplarId}>Confirmar empréstimo</Btn>
+    </Modal>
+  );
+}
+
+function RecusarSolicitacaoModal({ sol, onConfirm, onClose }) {
+  const [just, setJust] = useState("");
+  const [err, setErr] = useState("");
+  return (
+    <Modal title="Recusar Solicitação" onClose={onClose} width={420}>
+      <p style={{ fontSize: 13, color: COLORS.neutral, marginTop: 0 }}>Recusando solicitação de <strong>{sol.solicitanteNome}</strong>.</p>
+      <Field label="Justificativa" required><Textarea value={just} onChange={(e) => setJust(e.target.value)} placeholder="Explique o motivo da recusa..." /></Field>
+      {err && <div style={{ color: COLORS.danger, fontSize: 13, marginBottom: 10 }}>{err}</div>}
+      <Btn variant="danger" style={{ width: "100%", justifyContent: "center", background: "transparent" }} onClick={() => { if (!just.trim()) { setErr("Informe uma justificativa."); return; } onConfirm(just.trim()); }}>Confirmar recusa</Btn>
+    </Modal>
+  );
+}
+
+/* Part C: Novo empréstimo direto (admin) com busca de usuário */
+function NovoEmprestimoForm({ titulos, exemplares, ctx, onSave, onClose }) {
+  const { usuarios, setUsuarios } = ctx;
+  const [tituloId, setTituloId] = useState("");
+  const [exemplarId, setExemplarId] = useState("");
+  const [locatarioBusca, setLocatarioBusca] = useState("");
+  const [locatarioSelecionado, setLocatarioSelecionado] = useState(null); // {cpf, nome}
   const [dataDevolucao, setDataDevolucao] = useState(addDays(todayISO(), 14));
   const [observacoes, setObservacoes] = useState("");
   const [err, setErr] = useState("");
+  const [cadastrando, setCadastrando] = useState(false);
 
-  function mockScan() {
-    if (livros.length) setLivroId(livros[0].id);
-  }
+  const exsDisponiveis = exemplares.filter((ex) => ex.tituloId === tituloId && ex.status === "Disponível");
+
+  useEffect(() => {
+    setExemplarId(exsDisponiveis[0]?.id || "");
+  }, [tituloId]);
+
+  const resultadosBusca = locatarioBusca.trim().length >= 2
+    ? usuarios.filter((u) => u.nome.toLowerCase().includes(locatarioBusca.toLowerCase()) || u.cpf.includes(locatarioBusca.replace(/\D/g, "")))
+    : [];
 
   function submit(e) {
     e.preventDefault();
-    if (!livroId || !locatario.trim() || !dataDevolucao) { setErr("Preencha livro, locatário e data de devolução."); return; }
-    onSave({ livroId, locatario: locatario.trim(), dataEmprestimo: todayISO(), dataDevolucao, observacoes });
+    if (!tituloId || !exemplarId) { setErr("Selecione um título e exemplar disponível."); return; }
+    if (!locatarioSelecionado) { setErr("Selecione um locatário."); return; }
+    if (!dataDevolucao) { setErr("Informe a data de devolução."); return; }
+    onSave({ exemplarId, tituloId, locatario: locatarioSelecionado.nome, locatarioCpf: locatarioSelecionado.cpf, dataDevolucao, observacoes });
+  }
+
+  function selecionarLocatario(u) {
+    setLocatarioSelecionado({ cpf: u.cpf, nome: u.nome });
+    setLocatarioBusca(u.nome);
+    setCadastrando(false);
+  }
+
+  function salvarNovoCadastro(novoUsuario) {
+    setUsuarios((prev) => [...prev, novoUsuario]);
+    selecionarLocatario(novoUsuario);
   }
 
   return (
-    <Modal title="Novo Empréstimo" onClose={onClose}>
+    <Modal title="Novo Empréstimo" onClose={onClose} width={500}>
       <form onSubmit={submit}>
-        <Btn type="button" variant="ghost" icon={Camera} onClick={mockScan} style={{ width: "100%", marginBottom: 16 }}>Escanear livro</Btn>
-        <Field label="Livro" required>
-          <Select value={livroId} onChange={(e) => setLivroId(e.target.value)}>
-            <option value="">Selecione um livro</option>
-            {livros.map((l) => <option key={l.id} value={l.id}>{l.titulo}</option>)}
+        <Field label="Título" required>
+          <Select value={tituloId} onChange={(e) => setTituloId(e.target.value)}>
+            <option value="">Selecione um título</option>
+            {titulos.map((t) => <option key={t.id} value={t.id}>{t.titulo}</option>)}
           </Select>
         </Field>
-        <Field label="Nome do Locatário" required>
-          <Input value={locatario} onChange={(e) => setLocatario(e.target.value)} />
+        {tituloId && (
+          <Field label="Exemplar disponível" required>
+            {exsDisponiveis.length === 0
+              ? <div style={{ fontSize: 13, color: COLORS.danger }}>Nenhum exemplar disponível para este título.</div>
+              : <Select value={exemplarId} onChange={(e) => setExemplarId(e.target.value)}>
+                  {exsDisponiveis.map((ex) => <option key={ex.id} value={ex.id}>{ex.tombo} — {ex.estadoConservacao}</option>)}
+                </Select>
+            }
+          </Field>
+        )}
+
+        <Field label="Locatário" required hint="Busque por nome ou CPF">
+          <div style={{ position: "relative" }}>
+            <Input value={locatarioBusca} onChange={(e) => { setLocatarioBusca(e.target.value); setLocatarioSelecionado(null); setCadastrando(false); }} placeholder="Digite nome ou CPF..." />
+            {locatarioSelecionado && <div style={{ position: "absolute", right: 10, top: 10, color: COLORS.success }}><CheckCircle2 size={16} /></div>}
+          </div>
+          {resultadosBusca.length > 0 && !locatarioSelecionado && (
+            <div style={{ border: `1px solid ${COLORS.border}`, borderRadius: 8, marginTop: 4, overflow: "hidden" }}>
+              {resultadosBusca.slice(0, 5).map((u) => (
+                <button key={u.cpf} type="button" onClick={() => selecionarLocatario(u)} style={{ width: "100%", textAlign: "left", padding: "8px 12px", background: "none", border: "none", borderBottom: `1px solid ${COLORS.border}`, cursor: "pointer", fontSize: 13 }}>
+                  <strong>{u.nome}</strong> <span style={{ color: COLORS.neutral }}>· {u.cpf}</span>
+                </button>
+              ))}
+            </div>
+          )}
+          {locatarioBusca.trim().length >= 2 && resultadosBusca.length === 0 && !locatarioSelecionado && (
+            <div style={{ marginTop: 6, display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: COLORS.neutral }}>
+              Nenhum usuário encontrado.
+              <Btn type="button" variant="ghost" icon={UserPlus} style={{ padding: "4px 10px", fontSize: 12 }} onClick={() => setCadastrando(true)}>Cadastrar</Btn>
+            </div>
+          )}
         </Field>
+
+        {cadastrando && (
+          <div style={{ border: `1px solid ${COLORS.border}`, borderRadius: 10, padding: 14, marginBottom: 12, background: COLORS.bgAlt }}>
+            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10 }}>Novo cadastro rápido</div>
+            <CadastroRapidoLocatario usuariosExistentes={usuarios} onSave={salvarNovoCadastro} onCancel={() => setCadastrando(false)} />
+          </div>
+        )}
+
         <Field label="Data de Devolução" required>
-          <Input type="date" value={dataDevolucao} onChange={(e) => setDataDevolucao(e.target.value)} />
+          <Input type="date" value={dataDevolucao} onChange={(e) => setDataDevolucao(e.target.value)} min={todayISO()} />
         </Field>
         <Field label="Observações">
           <Textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} />
@@ -2185,6 +2389,39 @@ function NovoEmprestimoForm({ livros, onSave, onClose }) {
         <Btn type="submit" style={{ width: "100%", justifyContent: "center" }}>Registrar Empréstimo</Btn>
       </form>
     </Modal>
+  );
+}
+
+function CadastroRapidoLocatario({ usuariosExistentes, onSave, onCancel }) {
+  const [cpf, setCpf] = useState("");
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [telefone, setTelefone] = useState("");
+  const [err, setErr] = useState("");
+
+  function submit(e) {
+    e.preventDefault();
+    const cpfLimpo = cpf.replace(/\D/g, "");
+    if (!cpfLimpo || cpfLimpo.length !== 11) { setErr("CPF deve ter 11 dígitos."); return; }
+    if (usuariosExistentes.some((u) => u.cpf === cpfLimpo)) { setErr("Já existe usuário com este CPF."); return; }
+    if (!nome.trim()) { setErr("Nome é obrigatório."); return; }
+    onSave({ cpf: cpfLimpo, nome: nome.trim(), email: email.trim(), telefone: telefone.trim(), perfil: "leitor", senha: cpfLimpo, ativo: true, tokenSenha: null });
+  }
+
+  return (
+    <form onSubmit={submit}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        <Field label="CPF" required><Input value={cpf} onChange={(e) => setCpf(e.target.value)} placeholder="00000000000" /></Field>
+        <Field label="Nome" required><Input value={nome} onChange={(e) => setNome(e.target.value)} /></Field>
+        <Field label="E-mail"><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></Field>
+        <Field label="Telefone"><Input value={telefone} onChange={(e) => setTelefone(e.target.value)} /></Field>
+      </div>
+      {err && <div style={{ color: COLORS.danger, fontSize: 12, marginBottom: 8 }}>{err}</div>}
+      <div style={{ display: "flex", gap: 8 }}>
+        <Btn type="submit" style={{ flex: 1, justifyContent: "center" }}>Cadastrar e selecionar</Btn>
+        <Btn type="button" variant="ghost" onClick={onCancel}>Cancelar</Btn>
+      </div>
+    </form>
   );
 }
 
@@ -2222,17 +2459,22 @@ function RenovacaoForm({ emprestimo, onSave, onClose }) {
    SCREEN: RENOVAÇÕES (Admin)
    ========================================================================= */
 function RenovacoesAdminScreen({ ctx }) {
-  const { renovacoes, setRenovacoes, emprestimos, setEmprestimos, livros, sendNotif, showToast } = ctx;
+  const { renovacoes, setRenovacoes, emprestimos, setEmprestimos, titulos, exemplares, sendNotif, showToast } = ctx;
   const [decidindo, setDecidindo] = useState(null);
 
   const pendentes = renovacoes.filter((r) => r.status === "Solicitada");
   const decididas = renovacoes.filter((r) => r.status !== "Solicitada").slice(0, 8);
 
+  function getTitulo(r) {
+    const emp = emprestimos.find((e) => e.id === r.emprestimoId);
+    return emp ? getTituloFromEmprestimo(emp, exemplares, titulos) : null;
+  }
+
   function aprovar(r, novaData) {
     setRenovacoes((prev) => prev.map((x) => (x.id === r.id ? { ...x, status: "Aprovada", novaData } : x)));
     setEmprestimos((prev) => prev.map((e) => (e.id === r.emprestimoId ? { ...e, dataDevolucao: novaData, status: "Ativo", renovacao: "Aprovada" } : e)));
-    const livro = livros.find((l) => l.id === r.livroId);
-    sendNotif("Renovação aprovada", r.locatario, `Sua renovação foi aprovada! Novo prazo de devolução de "${livro?.titulo}": ${fmtDate(novaData)}.`);
+    const titulo = getTitulo(r);
+    sendNotif("Renovação aprovada", r.locatario, `Sua renovação foi aprovada! Novo prazo de devolução de "${titulo?.titulo}": ${fmtDate(novaData)}.`);
     showToast("Renovação aprovada e leitor notificado (simulado).");
     setDecidindo(null);
   }
@@ -2240,8 +2482,8 @@ function RenovacoesAdminScreen({ ctx }) {
   function recusar(r, justificativaAdmin) {
     setRenovacoes((prev) => prev.map((x) => (x.id === r.id ? { ...x, status: "Recusada", justificativaAdmin } : x)));
     setEmprestimos((prev) => prev.map((e) => (e.id === r.emprestimoId ? { ...e, renovacao: "Recusada" } : e)));
-    const livro = livros.find((l) => l.id === r.livroId);
-    sendNotif("Renovação recusada", r.locatario, `Sua solicitação de renovação para "${livro?.titulo}" foi recusada. Motivo: ${justificativaAdmin}`);
+    const titulo = getTitulo(r);
+    sendNotif("Renovação recusada", r.locatario, `Sua solicitação de renovação para "${titulo?.titulo}" foi recusada. Motivo: ${justificativaAdmin}`);
     showToast("Renovação recusada e leitor notificado (simulado).");
     setDecidindo(null);
   }
@@ -2254,11 +2496,11 @@ function RenovacoesAdminScreen({ ctx }) {
       ) : (
         <div style={{ display: "grid", gap: 12 }}>
           {pendentes.map((r) => {
-            const livro = livros.find((l) => l.id === r.livroId);
+            const titulo = getTitulo(r);
             return (
               <div key={r.id} style={{ background: "#fff", border: `1px solid ${COLORS.border}`, borderRadius: 14, padding: 16 }}>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <h3 style={{ margin: 0, fontFamily: "'Source Serif 4', serif", fontSize: 16 }}>{livro?.titulo}</h3>
+                  <h3 style={{ margin: 0, fontFamily: "'Source Serif 4', serif", fontSize: 16 }}>{titulo?.titulo}</h3>
                   <Badge tone="warn">Solicitada</Badge>
                 </div>
                 <p style={{ fontSize: 13, color: COLORS.neutral, margin: "4px 0" }}>Locatário: {r.locatario}</p>
@@ -2279,7 +2521,7 @@ function RenovacoesAdminScreen({ ctx }) {
           <div style={{ display: "grid", gap: 8 }}>
             {decididas.map((r) => (
               <div key={r.id} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, padding: "8px 0", borderBottom: `1px solid ${COLORS.border}` }}>
-                <span>{r.locatario} — {livros.find((l) => l.id === r.livroId)?.titulo}</span>
+                <span>{r.locatario} — {getTitulo(r)?.titulo}</span>
                 <StatusBadge status={r.status === "Aprovada" ? "Devolvido" : "Atrasado"} />
               </div>
             ))}
@@ -2409,13 +2651,13 @@ function NotifLogScreen({ ctx }) {
    SCREEN: LEITURA
    ========================================================================= */
 function LeituraScreen({ ctx }) {
-  const { leituras, setLeituras, livros, showToast } = ctx;
+  const { leituras, setLeituras, titulos, showToast } = ctx;
   const [query, setQuery] = useState("");
   const [formOpen, setFormOpen] = useState(false);
 
   const filtered = leituras.filter((l) => {
-    const livro = livros.find((b) => b.id === l.livroId);
-    return !query || (livro && livro.titulo.toLowerCase().includes(query.toLowerCase()));
+    const titulo = titulos.find((t) => t.id === l.livroId);
+    return !query || (titulo && titulo.titulo.toLowerCase().includes(query.toLowerCase()));
   });
 
   function add(livroId) {
@@ -2439,11 +2681,11 @@ function LeituraScreen({ ctx }) {
       ) : (
         <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
           {filtered.map((l) => {
-            const livro = livros.find((b) => b.id === l.livroId);
+            const titulo = titulos.find((t) => t.id === l.livroId);
             return (
               <div key={l.id} style={{ background: "#fff", border: `1px solid ${COLORS.border}`, borderRadius: 14, padding: 16 }}>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <h3 style={{ margin: 0, fontFamily: "'Source Serif 4', serif", fontSize: 16 }}>{livro?.titulo}</h3>
+                  <h3 style={{ margin: 0, fontFamily: "'Source Serif 4', serif", fontSize: 16 }}>{titulo?.titulo}</h3>
                   <Btn variant="icon" onClick={() => remover(l.id)}><Trash2 size={14} /></Btn>
                 </div>
                 <p style={{ fontSize: 12, color: COLORS.neutral, margin: "4px 0 10px" }}>Iniciado em {fmtDate(l.inicio)}</p>
@@ -2461,11 +2703,11 @@ function LeituraScreen({ ctx }) {
         <Modal title="Iniciar Leitura" onClose={() => setFormOpen(false)} width={420}>
           <p style={{ fontSize: 13, color: COLORS.neutral, marginTop: 0 }}>Selecione um livro para acompanhar:</p>
           <div style={{ display: "grid", gap: 8, maxHeight: 320, overflowY: "auto" }}>
-            {livros.map((l) => (
-              <button key={l.id} onClick={() => add(l.id)} style={{
+            {titulos.map((t) => (
+              <button key={t.id} onClick={() => add(t.id)} style={{
                 textAlign: "left", background: COLORS.bgAlt, border: "none", borderRadius: 10, padding: "10px 12px", cursor: "pointer", fontFamily: "Inter, sans-serif",
               }}>
-                {l.titulo} <span style={{ color: COLORS.neutral, fontSize: 12 }}> · {l.autor}</span>
+                {t.titulo} <span style={{ color: COLORS.neutral, fontSize: 12 }}> · {t.autor}</span>
               </button>
             ))}
           </div>
@@ -2479,7 +2721,7 @@ function LeituraScreen({ ctx }) {
    SCREEN: LISTA DE DESEJOS
    ========================================================================= */
 function ListaDesejosScreen({ ctx, setRoute }) {
-  const { desejos, addDesejo, removeDesejo, livros } = ctx;
+  const { desejos, addDesejo, removeDesejo, titulos } = ctx;
   const [adding, setAdding] = useState(desejos.length === 0);
 
   useEffect(() => {
@@ -2504,7 +2746,7 @@ function ListaDesejosScreen({ ctx, setRoute }) {
       ) : (
         <div style={{ display: "grid", gap: 12, marginBottom: 18 }}>
           {desejos.map((item) => {
-            const match = findCatalogMatch(item, livros);
+            const match = findCatalogMatch(item, titulos);
             return (
               <WishlistCard
                 key={item.id}
@@ -2822,7 +3064,7 @@ function PerfilScreen({ ctx }) {
    SCREEN: ANOTAÇÕES
    ========================================================================= */
 function AnotacoesScreen({ ctx }) {
-  const { anotacoes, setAnotacoes, livros } = ctx;
+  const { anotacoes, setAnotacoes, titulos } = ctx;
   const [query, setQuery] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -2861,21 +3103,21 @@ function AnotacoesScreen({ ctx }) {
           ))}
         </div>
       )}
-      {formOpen && <AnotacaoForm initial={editing} livros={livros} onSave={save} onClose={() => { setFormOpen(false); setEditing(null); }} />}
+      {formOpen && <AnotacaoForm initial={editing} titulos={titulos} onSave={save} onClose={() => { setFormOpen(false); setEditing(null); }} />}
       {toDelete && <Confirm text="Excluir esta anotação?" onConfirm={() => { setAnotacoes((prev) => prev.filter((a) => a.id !== toDelete.id)); setToDelete(null); }} onCancel={() => setToDelete(null)} />}
     </div>
   );
 }
 
-function AnotacaoForm({ initial, livros, onSave, onClose }) {
-  const [livroId, setLivroId] = useState(initial?.livroId || (livros[0]?.id ?? ""));
+function AnotacaoForm({ initial, titulos, onSave, onClose }) {
+  const [livroId, setLivroId] = useState(initial?.livroId || (titulos[0]?.id ?? ""));
   const [nota, setNota] = useState(initial?.nota || 0);
   const [texto, setTexto] = useState(initial?.texto || "");
 
   function submit(e) {
     e.preventDefault();
-    const livro = livros.find((l) => l.id === livroId);
-    onSave({ livroId, titulo: livro?.titulo || "Anotação", nota, texto });
+    const titulo = titulos.find((t) => t.id === livroId);
+    onSave({ livroId, titulo: titulo?.titulo || "Anotação", nota, texto });
   }
 
   return (
@@ -2883,7 +3125,7 @@ function AnotacaoForm({ initial, livros, onSave, onClose }) {
       <form onSubmit={submit}>
         <Field label="Livro" required>
           <Select value={livroId} onChange={(e) => setLivroId(e.target.value)}>
-            {livros.map((l) => <option key={l.id} value={l.id}>{l.titulo}</option>)}
+            {titulos.map((t) => <option key={t.id} value={t.id}>{t.titulo}</option>)}
           </Select>
         </Field>
         <Field label="Nota"><Stars value={nota} onChange={setNota} /></Field>
@@ -2897,8 +3139,14 @@ function AnotacaoForm({ initial, livros, onSave, onClose }) {
 /* =========================================================================
    SCREEN: COMUNIDADE
    ========================================================================= */
+const PRIORIDADES_SUG = ["Alta", "Média", "Baixa"];
+const STATUS_SUG = ["Em análise", "Planejado", "Em desenvolvimento", "Concluído", "Recusado"];
+const STATUS_SUG_COLORS = { "Em análise": "#6366f1", "Planejado": "#0891b2", "Em desenvolvimento": "#d97706", "Concluído": COLORS.success, "Recusado": COLORS.danger };
+const PRIORIDADE_COLORS = { "Alta": COLORS.danger, "Média": "#d97706", "Baixa": COLORS.neutral };
+
 function ComunidadeScreen({ ctx }) {
-  const { posts, setPosts, grupos, setGrupos, auth } = ctx;
+  const { posts, setPosts, grupos, setGrupos, auth, sugestoes, setSugestoes } = ctx;
+  const isAdmin = auth.perfil === "administrador";
   const [tab, setTab] = useState("feed");
   const [novoPost, setNovoPost] = useState("");
   const [novoComentario, setNovoComentario] = useState({});
@@ -2935,12 +3183,19 @@ function ComunidadeScreen({ ctx }) {
     }));
   }
 
+  const tabItems = [
+    { key: "feed", label: "Feed" },
+    { key: "grupos", label: "Grupos" },
+    { key: "sugestoes", label: "Sugestões" },
+  ];
+
   return (
     <div>
-      <PageTitle title="Comunidade" subtitle="Feed, grupos e interação entre leitores" />
+      <PageTitle title="Comunidade" subtitle="Feed, grupos e sugestões de acervo" />
       <div style={{ display: "flex", gap: 8, marginBottom: 18 }}>
-        <Btn variant={tab === "feed" ? "primary" : "ghost"} onClick={() => { setTab("feed"); setGrupoAtivo(null); }}>Feed</Btn>
-        <Btn variant={tab === "grupos" ? "primary" : "ghost"} onClick={() => { setTab("grupos"); setGrupoAtivo(null); }}>Grupos</Btn>
+        {tabItems.map((t) => (
+          <Btn key={t.key} variant={tab === t.key ? "primary" : "ghost"} onClick={() => { setTab(t.key); setGrupoAtivo(null); }}>{t.label}</Btn>
+        ))}
       </div>
 
       {tab === "feed" && (
@@ -2983,6 +3238,112 @@ function ComunidadeScreen({ ctx }) {
 
       {tab === "grupos" && grupoAtivo && (
         <GrupoDetalhe grupo={grupos.find((g) => g.id === grupoAtivo)} setGrupos={setGrupos} auth={auth} onBack={() => setGrupoAtivo(null)} />
+      )}
+
+      {tab === "sugestoes" && (
+        <SugestoesTab sugestoes={sugestoes} setSugestoes={setSugestoes} auth={auth} isAdmin={isAdmin} />
+      )}
+    </div>
+  );
+}
+
+/* Part E: Sugestões tab */
+function SugestoesTab({ sugestoes, setSugestoes, auth, isAdmin }) {
+  const [novoTitulo, setNovoTitulo] = useState("");
+  const [novaDesc, setNovaDesc] = useState("");
+  const [formOpen, setFormOpen] = useState(false);
+  const [err, setErr] = useState("");
+
+  const sorted = [...sugestoes].sort((a, b) => b.votos.length - a.votos.length);
+
+  function votar(id) {
+    setSugestoes((prev) => prev.map((s) => {
+      if (s.id !== id) return s;
+      const voted = s.votos.includes(auth.cpf);
+      return { ...s, votos: voted ? s.votos.filter((c) => c !== auth.cpf) : [...s.votos, auth.cpf] };
+    }));
+  }
+
+  function publicar(e) {
+    e.preventDefault();
+    if (!novoTitulo.trim() || !novaDesc.trim()) { setErr("Título e descrição são obrigatórios."); return; }
+    setSugestoes((prev) => [...prev, { id: uid("SG"), titulo: novoTitulo.trim(), descricao: novaDesc.trim(), autorNome: auth.nome, autorCpf: auth.cpf, data: new Date().toISOString(), votos: [], prioridade: null, statusSugestao: "Em análise" }]);
+    setNovoTitulo(""); setNovaDesc(""); setFormOpen(false); setErr("");
+  }
+
+  function adminUpdate(id, campo, valor) {
+    setSugestoes((prev) => prev.map((s) => s.id === id ? { ...s, [campo]: valor } : s));
+  }
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+        <div style={{ fontSize: 13, color: COLORS.neutral }}>{sugestoes.length} sugestão(ões) · ordernadas por votos</div>
+        <Btn icon={Plus} onClick={() => setFormOpen((v) => !v)}>{formOpen ? "Fechar" : "Nova sugestão"}</Btn>
+      </div>
+
+      {formOpen && (
+        <form onSubmit={publicar} style={{ background: "#fff", border: `1.5px solid #0d9488`, borderRadius: 14, padding: 16, marginBottom: 16 }}>
+          <Field label="Título da sugestão" required><Input value={novoTitulo} onChange={(e) => setNovoTitulo(e.target.value)} placeholder="Ex: Adicionar livros de Clarice Lispector" /></Field>
+          <Field label="Descrição" required><Textarea value={novaDesc} onChange={(e) => setNovaDesc(e.target.value)} placeholder="Por que este livro seria valioso para o acervo?" /></Field>
+          {err && <div style={{ color: COLORS.danger, fontSize: 12, marginBottom: 8 }}>{err}</div>}
+          <Btn type="submit" style={{ background: "#0d9488" }}>Enviar sugestão</Btn>
+        </form>
+      )}
+
+      {sorted.length === 0 ? (
+        <div style={{ textAlign: "center", padding: "40px 20px", color: COLORS.neutral }}>
+          <Layers size={36} style={{ opacity: 0.35, marginBottom: 10 }} />
+          <div style={{ fontSize: 14 }}>Nenhuma sugestão ainda. Seja o primeiro a sugerir um título!</div>
+        </div>
+      ) : (
+        <div style={{ display: "grid", gap: 10 }}>
+          {sorted.map((s) => {
+            const voted = s.votos.includes(auth.cpf);
+            const stColor = STATUS_SUG_COLORS[s.statusSugestao] || COLORS.neutral;
+            const prColor = s.prioridade ? PRIORIDADE_COLORS[s.prioridade] : COLORS.neutral;
+            return (
+              <div key={s.id} style={{ background: "#fff", border: `1px solid ${COLORS.border}`, borderLeft: `4px solid #0d9488`, borderRadius: 12, padding: 16 }}>
+                <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                  {/* Vote column */}
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, flexShrink: 0 }}>
+                    <button onClick={() => votar(s.id)} style={{ background: voted ? "#0d9488" : COLORS.bgAlt, border: `1px solid ${voted ? "#0d9488" : COLORS.border}`, borderRadius: 8, padding: "6px 8px", cursor: "pointer", color: voted ? "#fff" : COLORS.neutral, display: "flex", alignItems: "center", gap: 3, fontSize: 13, fontWeight: 700 }}>
+                      <ThumbsUp size={14} /> {s.votos.length}
+                    </button>
+                  </div>
+                  {/* Content */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: 16, fontWeight: 600, color: COLORS.ink, marginBottom: 4 }}>{s.titulo}</div>
+                    <div style={{ fontSize: 13, color: COLORS.neutral, marginBottom: 8 }}>{s.descricao}</div>
+                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", fontSize: 11 }}>
+                      <span style={{ color: COLORS.neutral }}>{s.autorNome} · {fmtDate(s.data.slice(0, 10))}</span>
+                      <span style={{ background: stColor + "22", color: stColor, padding: "2px 8px", borderRadius: 999, fontWeight: 600 }}>{s.statusSugestao}</span>
+                      {s.prioridade && <span style={{ background: prColor + "22", color: prColor, padding: "2px 8px", borderRadius: 999, fontWeight: 600 }}>Prioridade {s.prioridade}</span>}
+                    </div>
+                    {/* Admin controls */}
+                    {isAdmin && (
+                      <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
+                        <div>
+                          <label style={{ fontSize: 11, color: COLORS.neutral, display: "block", marginBottom: 3 }}>Prioridade</label>
+                          <Select value={s.prioridade || ""} onChange={(e) => adminUpdate(s.id, "prioridade", e.target.value || null)} style={{ fontSize: 12, padding: "4px 8px" }}>
+                            <option value="">—</option>
+                            {PRIORIDADES_SUG.map((p) => <option key={p} value={p}>{p}</option>)}
+                          </Select>
+                        </div>
+                        <div>
+                          <label style={{ fontSize: 11, color: COLORS.neutral, display: "block", marginBottom: 3 }}>Status</label>
+                          <Select value={s.statusSugestao} onChange={(e) => adminUpdate(s.id, "statusSugestao", e.target.value)} style={{ fontSize: 12, padding: "4px 8px" }}>
+                            {STATUS_SUG.map((st) => <option key={st} value={st}>{st}</option>)}
+                          </Select>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       )}
     </div>
   );
@@ -3072,7 +3433,7 @@ function GrupoDetalhe({ grupo, setGrupos, auth, onBack }) {
    SCREEN: GESTÃO DE USUÁRIOS (Admin)
    ========================================================================= */
 function GestaoUsuariosScreen({ ctx }) {
-  const { usuarios, setUsuarios, emprestimos, livros, sendNotif, showToast, auth } = ctx;
+  const { usuarios, setUsuarios, emprestimos, titulos, exemplares, sendNotif, showToast, auth } = ctx;
   const [query, setQuery] = useState("");
   const [detailCpf, setDetailCpf] = useState(null);
   const [editing, setEditing] = useState(null);
@@ -3118,7 +3479,8 @@ function GestaoUsuariosScreen({ ctx }) {
       <UsuarioDetalhe
         usuario={detailUser}
         emprestimos={emprestimos}
-        livros={livros}
+        titulos={titulos}
+        exemplares={exemplares}
         onBack={() => setDetailCpf(null)}
       />
     );
@@ -3221,10 +3583,10 @@ function GestaoUsuariosScreen({ ctx }) {
   );
 }
 
-function UsuarioDetalhe({ usuario, emprestimos, livros, onBack }) {
+function UsuarioDetalhe({ usuario, emprestimos, titulos, exemplares, onBack }) {
   const primeiroNome = usuario.nome.split(" ")[0].toLowerCase();
   const historico = emprestimos
-    .filter((e) => e.locatario.toLowerCase().includes(primeiroNome))
+    .filter((e) => (e.locatarioCpf ? e.locatarioCpf === usuario.cpf : e.locatario.toLowerCase().includes(primeiroNome)))
     .sort((a, b) => new Date(b.dataEmprestimo) - new Date(a.dataEmprestimo));
 
   const ativo = usuario.ativo !== false;
@@ -3275,7 +3637,7 @@ function UsuarioDetalhe({ usuario, emprestimos, livros, onBack }) {
           <div style={{ position: "relative", paddingLeft: 28 }}>
             <div style={{ position: "absolute", left: 9, top: 10, bottom: 10, width: 2, background: COLORS.border }} />
             {historico.map((e, i) => {
-              const livro = livros.find((l) => l.id === e.livroId);
+              const tituloEmp = getTituloFromEmprestimo(e, exemplares, titulos);
               const cor = corDot(e.status);
               return (
                 <div key={e.id} style={{ position: "relative", marginBottom: i < historico.length - 1 ? 20 : 0 }}>
@@ -3289,7 +3651,7 @@ function UsuarioDetalhe({ usuario, emprestimos, livros, onBack }) {
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, flexWrap: "wrap" }}>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: 15, fontWeight: 600, color: COLORS.ink, marginBottom: 4 }}>
-                          {livro?.titulo || "Livro removido"}
+                          {tituloEmp?.titulo || "Livro removido"}
                         </div>
                         <div style={{ fontSize: 12, color: COLORS.neutral }}>
                           Empréstimo: {fmtDate(e.dataEmprestimo)} · Prazo: {fmtDate(e.dataDevolucao)}
